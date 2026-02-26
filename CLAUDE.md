@@ -1090,6 +1090,19 @@ rotate={45}            // Rotation
 <Text size={18} weight="bold" color="#000" font="Inter">Hello</Text>
 ```
 
+**WRONG vs RIGHT - Common Mistakes:**
+```jsx
+// WRONG                          // RIGHT
+layout="horizontal"               flex="row"
+layout="vertical"                 flex="col"
+padding={24}                      p={24}
+fill="#fff"                       bg="#fff"
+cornerRadius={12}                 rounded={12}
+direction="row"                   flex="row"
+backgroundColor="#fff"            bg="#fff"
+borderRadius={8}                  rounded={8}
+```
+
 ### Auto-Layout Best Practices
 
 **IMPORTANT:** To avoid clipped/cut-off content:
