@@ -129,49 +129,41 @@ node src/index.js connect
 
 ## IMPORTANT: When User Says "Initiate Project"
 
-### Step 1: Install dependencies
+Claude runs ALL commands automatically. User never types terminal commands.
+
+### Step 1: Install (Claude runs this)
 ```bash
 npm install
 ```
 
-### Step 2: Connect with Safe Mode (Recommended)
-
-Run:
+### Step 2: Start Safe Mode (Claude runs this)
 ```bash
 node src/index.js connect --safe
 ```
 
-Then guide user through Figma setup ONE STEP AT A TIME:
+### Step 3: Guide user through Figma (one step at a time)
 
-**Say:** "Open Figma Desktop. Tell me when it's open."
+**Say:** "Open Figma Desktop and tell me when it's ready."
 
-**After user confirms, say:** "Go to: **Plugins → Development → Import plugin from manifest**"
+**After user confirms, say:**
+"In Figma, go to **Plugins** menu (top bar) → **Development** → **Import plugin from manifest**"
 
-**After user confirms, say:** "Navigate to the figma-cli folder and select **plugin/manifest.json**, then click Open."
+**After user confirms, say:**
+"Find the **figma-cli** folder, open the **plugin** folder inside, select **manifest.json** and click Open"
 
-**After user confirms, say:** "Now run the plugin: **Plugins → Development → FigCli**"
+**After user confirms, say:**
+"Now start the plugin: **Plugins** → **Development** → **FigCli**. A small window will appear."
 
 **When terminal shows "Plugin connected!", say:**
-```
-Connected! You're ready to go.
+"Connected!
 
-TIP: Right-click the FigCli plugin → "Add to toolbar" for quick access next time.
+Next time you just need to click **Plugins → Development → FigCli** to reconnect.
+TIP: Right-click the plugin → 'Add to toolbar' for one-click access.
 
-Try asking me:
-- "Create a blue rectangle"
-- "Add Tailwind colors"
-- "Create a card component"
-```
-
-### Alternative: Yolo Mode (if user asks)
-
-Only use if user specifically asks for "automatic" or "no plugin" mode:
-
-```bash
-node src/index.js connect
-```
-
-This patches Figma (needs Full Disk Access on Mac). If permission error, suggest Safe Mode instead.
+What would you like to create? For example:
+- A button component
+- Tailwind colors
+- A card with image and text"
 
 ---
 

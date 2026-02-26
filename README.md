@@ -70,34 +70,32 @@ No explaining. No teaching. Just ask.
 
 ## Setup
 
-### 1. Open Terminal and start Claude
+### 1. Start Claude Code
 
+Open Terminal and type:
 ```bash
 claude
 ```
 
-### 2. Install
+### 2. Install & Connect
 
+Just say:
 ```
 Help me install https://github.com/silships/figma-cli
 ```
 
-### 3. Connect to Figma
-
-**Option A: Safe Mode (Recommended)**
+Then:
 ```
 Initiate project
 ```
-Choose "Safe Mode" when asked, then in Figma:
-1. **Plugins → Development → Import plugin from manifest**
-2. Select `plugin/manifest.json` from the cloned repo
-3. **Plugins → Development → FigCli** to start
 
-**Option B: Yolo Mode (Fully automatic, but patches Figma)**
-```
-Initiate project
-```
-Choose "Yolo Mode" when asked. Requires Full Disk Access on Mac.
+Claude handles everything. You just follow the Figma steps:
+1. Open Figma Desktop
+2. **Plugins → Development → Import plugin from manifest**
+3. Select `plugin/manifest.json` from the figma-cli folder
+4. **Plugins → Development → FigCli**
+
+Done! Now just talk to Claude about your designs.
 
 ---
 
