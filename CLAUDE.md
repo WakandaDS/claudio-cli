@@ -88,7 +88,19 @@ node src/index.js bind fill "primary/500" -n "BUTTON_ID"
 
 ## IMPORTANT: Two Connection Modes
 
-### 🔒 Safe Mode (Recommended)
+### 🚀 Yolo Mode (Recommended)
+
+**What:** Patches Figma once to enable debug port, then connects directly via CDP.
+
+**Pros:** Fully automatic, no manual steps after setup
+**Cons:** Needs Full Disk Access on macOS (one-time), modifies Figma app
+**Security:** Uses random port (9222-9322) per session, localhost only
+
+```bash
+node src/index.js connect
+```
+
+### 🔒 Safe Mode — For restricted environments
 
 **What:** Uses a Figma plugin for communication. No Figma modification.
 
@@ -109,22 +121,10 @@ node src/index.js connect --safe
 
 **Tip:** Right-click plugin → "Add to toolbar" for one-click access.
 
-### 🚀 Yolo Mode — Fully automatic
-
-**What:** Patches Figma once to enable debug port, then connects directly via CDP.
-
-**Pros:** Fully automatic, no manual steps after setup
-**Cons:** Needs Full Disk Access on macOS, modifies Figma app
-**Security:** Uses random port (9222-9322) per session, localhost only
-
-```bash
-node src/index.js connect
-```
-
-### When to suggest Yolo Mode
-- User wants zero manual steps
-- User has Full Disk Access granted
-- User is on personal Mac without restrictions
+### When to suggest Safe Mode
+- User gets permission errors with Yolo Mode
+- Corporate laptop with restricted permissions
+- User prefers not to modify Figma app
 
 ---
 
@@ -144,10 +144,27 @@ npm install
 Question: "How should I connect to Figma?"
 
 Options:
-1. **Safe Mode (Recommended)** - You'll start a small plugin in Figma
-2. **Yolo Mode** - Fully automatic, but needs system permissions
+1. **Yolo Mode (Recommended)** - Fully automatic, secure random port
+2. **Safe Mode** - Manual plugin start, for corporate/restricted environments
 
-### Step 3a: If Safe Mode (recommended)
+### Step 3a: If Yolo Mode (recommended)
+
+```bash
+node src/index.js connect
+```
+
+If permission error on macOS, explain:
+```
+Need Full Disk Access for one-time setup:
+
+1. System Settings → Privacy & Security → Full Disk Access
+2. Add Terminal (or your terminal app)
+3. Restart Terminal and try again
+
+Or choose Safe Mode instead (no permissions needed).
+```
+
+### Step 3b: If Safe Mode
 
 **FIRST explain what to do:**
 ```
@@ -172,14 +189,6 @@ Connected! Next time just: Plugins → Development → FigCli
 
 What would you like to create?
 ```
-
-### Step 3b: If Yolo Mode
-
-```bash
-node src/index.js connect
-```
-
-If permission error, explain Full Disk Access or suggest switching to Safe Mode.
 
 ---
 

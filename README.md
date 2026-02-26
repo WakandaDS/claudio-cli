@@ -89,11 +89,9 @@ Then:
 Initiate project
 ```
 
-Claude asks which connection mode, choose **Safe Mode (Recommended)**, then follow the Figma steps:
-1. Open Figma Desktop
-2. **Plugins → Development → Import plugin from manifest**
-3. Select `plugin/manifest.json` from the figma-cli folder
-4. **Plugins → Development → FigCli**
+Claude asks which connection mode:
+- **Yolo Mode (Recommended)** — Fully automatic, secure random port
+- **Safe Mode** — For corporate/restricted environments
 
 Done! Now just talk to Claude about your designs.
 
@@ -117,7 +115,32 @@ The included `CLAUDE.md` teaches Claude all commands automatically. No manual re
 
 ## Two Connection Modes
 
-### 🔒 Safe Mode (Recommended)
+### 🚀 Yolo Mode (Recommended)
+
+**What it does:** Patches Figma once to enable a debug port, then connects directly.
+
+**Pros:**
+- Fully automatic (no manual steps after setup)
+- Slightly faster execution
+- Secure: random port (9222-9322) per session, localhost only
+
+**Cons:**
+- Requires one-time Figma patch
+- Needs Full Disk Access on macOS (one-time)
+
+```
+┌─────────────┐      WebSocket (CDP)      ┌─────────────┐
+│     CLI     │ ◄───────────────────────► │   Figma     │
+└─────────────┘    localhost:random port  └─────────────┘
+```
+
+```bash
+node src/index.js connect
+```
+
+---
+
+### 🔒 Safe Mode — For Restricted Environments
 
 **What it does:** Uses a Figma plugin to communicate. No Figma modification needed.
 
@@ -125,7 +148,6 @@ The included `CLAUDE.md` teaches Claude all commands automatically. No manual re
 - No patching, no app modification
 - Works everywhere (corporate, personal, any environment)
 - No Full Disk Access needed
-- All features work
 
 **Cons:**
 - Start plugin manually each session (2 clicks)
@@ -154,42 +176,15 @@ node src/index.js connect --safe
 
 ---
 
-### 🚀 Yolo Mode — Fully Automatic
-
-**What it does:** Patches Figma once to enable a debug port, then connects directly.
-
-**Pros:**
-- Fully automatic (no manual steps after setup)
-- Slightly faster execution
-
-**Cons:**
-- Requires one-time Figma patch
-- Needs Full Disk Access on macOS
-- Modifies Figma app files
-
-**Security:** Uses a random port (9222-9322) for each session, bound to localhost only.
-
-```
-┌─────────────┐      WebSocket (CDP)      ┌─────────────┐
-│     CLI     │ ◄───────────────────────► │   Figma     │
-└─────────────┘    localhost:random port  └─────────────┘
-```
-
-```bash
-node src/index.js connect
-```
-
----
-
 ### Which Mode Should I Use?
 
 | Situation | Recommended Mode |
 |---|---|
-| First time user | **Safe Mode** |
+| First time user | **Yolo Mode** |
+| Personal Mac | **Yolo Mode** |
 | Corporate laptop | **Safe Mode** |
-| Personal Mac, want zero clicks | **Yolo Mode** |
 | Permission errors with Yolo | **Safe Mode** |
-| Any environment | **Safe Mode** |
+| Can't modify apps | **Safe Mode** |
 
 ---
 
