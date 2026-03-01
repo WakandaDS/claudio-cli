@@ -484,6 +484,9 @@ export class FigmaClient {
     const hug = props.hug || '';
     const hugWidth = hug === 'both' || hug === 'w' || hug === 'width';
     const hugHeight = hug === 'both' || hug === 'h' || hug === 'height';
+    // New: wrap and wrapGap for horizontal layouts
+    const wrap = props.wrap === true || props.wrap === 'true';
+    const wrapGap = Number(props.wrapGap || props.counterAxisSpacing || 0);
 
     // Collect all fonts recursively
     const fonts = new Set();
@@ -541,6 +544,14 @@ export class FigmaClient {
           // Clip defaults to false for nested frames
           const fClip = item.clip === 'true' || item.clip === true;
 
+          // NEW: wrap, wrapGap, grow, position props
+          const fWrap = item.wrap === true || item.wrap === 'true';
+          const fWrapGap = Number(item.wrapGap || item.counterAxisSpacing || 0);
+          const fGrow = item.grow !== undefined ? Number(item.grow) : null;
+          const fPosition = item.position || 'auto';
+          const fAbsoluteX = item.x !== undefined ? Number(item.x) : 0;
+          const fAbsoluteY = item.y !== undefined ? Number(item.y) : 0;
+
           // HUG by default, FIXED only if explicit size given
           const hasWidth = item.w !== undefined || item.width !== undefined;
           const hasHeight = item.h !== undefined || item.height !== undefined;
@@ -562,6 +573,7 @@ export class FigmaClient {
         const el${idx} = figma.createFrame();
         el${idx}.name = ${JSON.stringify(fName)};
         el${idx}.layoutMode = '${fFlex === 'row' ? 'HORIZONTAL' : 'VERTICAL'}';
+        ${fWrap && fFlex === 'row' ? `el${idx}.layoutWrap = 'WRAP';` : ''}
         el${idx}.primaryAxisSizingMode = '${hasWidth && !fillWidth ? 'FIXED' : 'AUTO'}';
         el${idx}.counterAxisSizingMode = '${hasHeight && !fillHeight ? 'FIXED' : 'AUTO'}';
         ${hasWidth && !fillWidth || hasHeight && !fillHeight ? `el${idx}.resize(${hasWidth ? fWidth : 100}, ${hasHeight ? fHeight : 40});` : ''}
@@ -579,7 +591,10 @@ export class FigmaClient {
         el${idx}.counterAxisAlignItems = '${fAlignVal}';
         el${idx}.clipsContent = ${fClip};
         ${parentVar}.appendChild(el${idx});
-        ${nestedChildren}`;
+        ${nestedChildren}
+        ${fWrap && fFlex === 'row' && fWrapGap > 0 ? `el${idx}.counterAxisSpacing = ${fWrapGap};` : ''}
+        ${fGrow !== null ? `el${idx}.layoutGrow = ${fGrow};` : ''}
+        ${fPosition === 'absolute' ? `el${idx}.layoutPositioning = 'ABSOLUTE'; el${idx}.x = ${fAbsoluteX}; el${idx}.y = ${fAbsoluteY};` : ''}`;
         } else if (item._type === 'rect') {
           // Rectangle element
           const rWidth = item.w || item.width || 100;
@@ -687,6 +702,7 @@ export class FigmaClient {
         frame.fills = [{type:'SOLID',color:${this.hexToRgbCode(bg)}}];
         ${stroke ? `frame.strokes = [{type:'SOLID',color:${this.hexToRgbCode(stroke)}}]; frame.strokeWeight = 1;` : ''}
         frame.layoutMode = '${flex === 'row' ? 'HORIZONTAL' : 'VERTICAL'}';
+        ${wrap && flex === 'row' ? `frame.layoutWrap = 'WRAP';` : ''}
         frame.itemSpacing = ${gap};
         frame.paddingTop = ${py};
         frame.paddingBottom = ${py};
@@ -696,6 +712,7 @@ export class FigmaClient {
         frame.counterAxisAlignItems = '${alignVal}';
         frame.primaryAxisSizingMode = '${hugWidth ? 'AUTO' : 'FIXED'}';
         frame.counterAxisSizingMode = '${hugHeight ? 'AUTO' : 'FIXED'}';
+        ${wrap && flex === 'row' && wrapGap > 0 ? `frame.counterAxisSpacing = ${wrapGap};` : ''}
         frame.clipsContent = ${clip};
 
         ${childCode}

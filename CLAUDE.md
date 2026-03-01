@@ -116,22 +116,77 @@ node src/index.js render '<Frame name="Landing Page" w={1440} flex="col" bg="#0a
 
 ```jsx
 // Layout
-flex="row"        // or "col"
-gap={16}
-p={24}            // padding all sides
-px={16} py={8}    // padding x/y
+flex="row"              // or "col"
+gap={16}                // spacing between items
+p={24}                  // padding all sides
+px={16} py={8}          // padding x/y
+pt={8} pr={16} pb={8} pl={16}  // individual padding
+
+// Alignment
+justify="center"        // main axis: start, center, end, between
+items="center"          // cross axis: start, center, end
 
 // Size
-w={320} h={200}   // fixed
-w="fill"          // fill parent
+w={320} h={200}         // fixed size
+w="fill" h="fill"       // fill parent
+minW={100} maxW={500}   // constraints
+minH={50} maxH={300}
 
 // Appearance
-bg="#fff"         // fill color
-rounded={16}      // corner radius
-stroke="#000"     // stroke color
+bg="#fff"               // fill color (or var:Name)
+stroke="#000"           // stroke color
+strokeWidth={2}         // stroke thickness
+strokeAlign="inside"    // inside, outside, center
+opacity={0.8}           // 0..1
+blendMode="multiply"    // multiply, overlay, etc.
+
+// Corners
+rounded={16}            // all corners
+roundedTL={8} roundedTR={8} roundedBL={0} roundedBR={0}  // individual
+cornerSmoothing={0.6}   // iOS squircle (0..1)
+
+// Effects
+shadow="4px 4px 12px rgba(0,0,0,0.25)"  // drop shadow
+blur={8}                // layer blur
+overflow="hidden"       // clip content
+rotate={45}             // rotation degrees
 
 // Text
-<Text size={18} weight="bold" color="#000">Hello</Text>
+<Text size={18} weight="bold" color="#000" font="Inter">Hello</Text>
+```
+
+### Auto-Layout
+
+```jsx
+// Wrap: items flow to next row when full
+wrap={true}             // layoutWrap = 'WRAP'
+rowGap={12}             // gap between rows (counterAxisSpacing)
+
+// Grow: expand to fill remaining space
+grow={1}                // layoutGrow = 1
+
+// Stretch: fill cross-axis
+stretch={true}          // layoutAlign = 'STRETCH'
+
+// Absolute: position freely within parent
+position="absolute" x={12} y={12}  // must have name for x/y to work
+```
+
+**Complete example:**
+```bash
+node src/index.js render '<Frame name="Card" w={300} flex="col" bg="#18181b" rounded={12} overflow="hidden">
+  <Frame w="fill" h={100} bg="#333" />
+  <Frame name="Badge" w={40} h={20} bg="#ef4444" rounded={4} position="absolute" x={12} y={12} />
+  <Frame name="Tags" flex="row" wrap={true} rowGap={8} gap={8} p={16}>
+    <Frame w={60} h={24} bg="#3b82f6" rounded={12} />
+    <Frame w={70} h={24} bg="#22c55e" rounded={12} />
+    <Frame w={80} h={24} bg="#a855f7" rounded={12} />
+  </Frame>
+  <Frame flex="row" p={16} gap={8}>
+    <Frame w={40} h="fill" bg="#222" />
+    <Frame h="fill" bg="#333" grow={1} />
+  </Frame>
+</Frame>'
 ```
 
 **Common mistakes (silently ignored, no error!):**

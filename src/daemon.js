@@ -18,6 +18,9 @@ const MODE = process.env.DAEMON_MODE || 'auto'; // 'auto', 'cdp', 'plugin'
 // CDP Client (Yolo Mode)
 let cdpClient = null;
 let isCdpConnecting = false;
+let lastHealthCheck = 0;
+let lastHealthResult = false;
+const HEALTH_CACHE_MS = 5000; // Cache health for 5 seconds
 
 // Plugin Client (Safe Mode)
 let pluginWs = null;
@@ -26,31 +29,47 @@ let pluginMsgId = 0;
 
 // ============ CDP MODE (YOLO) ============
 
-async function isCdpHealthy() {
+async function isCdpHealthy(forceCheck = false) {
+  // Quick WebSocket state check (no network call)
   if (!cdpClient || !cdpClient.ws) return false;
   if (cdpClient.ws.readyState !== 1) return false;
 
+  // Use cached result if recent (avoids constant eval calls)
+  const now = Date.now();
+  if (!forceCheck && now - lastHealthCheck < HEALTH_CACHE_MS) {
+    return lastHealthResult;
+  }
+
   try {
     const result = await Promise.race([
-      cdpClient.eval('typeof figma !== "undefined"'),
-      new Promise((_, reject) => setTimeout(() => reject(new Error('timeout')), 2000))
+      cdpClient.eval('1'), // Simple eval, just check connection works
+      new Promise((_, reject) => setTimeout(() => reject(new Error('timeout')), 5000))
     ]);
-    return result === true;
+    lastHealthCheck = now;
+    lastHealthResult = result === 1;
+    return lastHealthResult;
   } catch {
+    lastHealthCheck = now;
+    lastHealthResult = false;
     return false;
   }
 }
 
 async function getCdpClient() {
-  if (cdpClient) {
-    const healthy = await isCdpHealthy();
-    if (healthy) return cdpClient;
-
-    console.log('[daemon] CDP connection stale, reconnecting...');
-    try { cdpClient.close(); } catch {}
-    cdpClient = null;
+  // Fast path: if we have a client with open WebSocket, use it
+  if (cdpClient && cdpClient.ws && cdpClient.ws.readyState === 1) {
+    return cdpClient;
   }
 
+  // WebSocket closed, need to reconnect
+  if (cdpClient) {
+    console.log('[daemon] CDP WebSocket closed, reconnecting...');
+    try { cdpClient.close(); } catch {}
+    cdpClient = null;
+    lastHealthResult = false;
+  }
+
+  // Wait if another connection attempt is in progress
   if (isCdpConnecting) {
     while (isCdpConnecting) {
       await new Promise(r => setTimeout(r, 100));
@@ -62,6 +81,8 @@ async function getCdpClient() {
   try {
     cdpClient = new FigmaClient();
     await cdpClient.connect();
+    lastHealthCheck = Date.now();
+    lastHealthResult = true;
     console.log('[daemon] Connected to Figma via CDP (Yolo Mode)');
   } finally {
     isCdpConnecting = false;
@@ -193,7 +214,7 @@ async function handleRequest(req, res) {
             return Promise.race([
               fn(),
               new Promise((_, reject) =>
-                setTimeout(() => reject(new Error('Execution timeout')), 30000)
+                setTimeout(() => reject(new Error('Execution timeout')), 60000)
               )
             ]);
           };

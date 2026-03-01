@@ -286,7 +286,7 @@ function figmaEvalSync(code) {
       writeFileSync(payloadFile, payload);
       const result = execSync(
         `curl -s -X POST http://127.0.0.1:3456/exec -H "Content-Type: application/json" -d @${payloadFile}`,
-        { encoding: 'utf8', timeout: 30000 }
+        { encoding: 'utf8', timeout: 60000 }
       );
       try { unlinkSync(payloadFile); } catch {}
       if (!result || result.trim() === '') {
@@ -332,7 +332,7 @@ function figmaEvalSync(code) {
 
   writeFileSync(tempFile, script);
   try {
-    execSync(`node ${tempFile}`, { stdio: 'pipe', timeout: 30000 });
+    execSync(`node ${tempFile}`, { stdio: 'pipe', timeout: 60000 });
     if (existsSync(resultFile)) {
       const data = JSON.parse(readFileSync(resultFile, 'utf8'));
       try { execSync(`rm -f ${tempFile} ${resultFile}`, { stdio: 'pipe' }); } catch {}
@@ -4356,6 +4356,182 @@ function getNextFreeY(gap = 100) {
   }
 }
 
+// Helper: Extract properties that figma-use doesn't handle correctly
+// Returns array of fixes to apply after render
+function extractPostProcessFixes(jsx) {
+  const fixes = [];
+
+  // Match ALL Frame elements with wrapGap (counterAxisSpacing) - including nested
+  const wrapGapRegex = /<Frame[^>]*\bwrapGap=\{(\d+)\}[^>]*>/g;
+  let wrapMatch;
+  while ((wrapMatch = wrapGapRegex.exec(jsx)) !== null) {
+    const tag = wrapMatch[0];
+    const nameMatch = tag.match(/\bname=["']([^"']+)["']/);
+    fixes.push({
+      type: 'wrapGap',
+      name: nameMatch ? nameMatch[1] : null,
+      value: parseInt(wrapMatch[1])
+    });
+  }
+
+  // Match absolute positioned children with x/y
+  const absRegex = /<Frame[^>]*\bposition=["']absolute["'][^>]*>/g;
+  let match;
+  while ((match = absRegex.exec(jsx)) !== null) {
+    const tag = match[0];
+    const nameMatch = tag.match(/\bname=["']([^"']+)["']/);
+    const xMatch = tag.match(/\bx=\{(\d+)\}/);
+    const yMatch = tag.match(/\by=\{(\d+)\}/);
+
+    if (nameMatch && (xMatch || yMatch)) {
+      fixes.push({
+        type: 'absolutePosition',
+        name: nameMatch[1],
+        x: xMatch ? parseInt(xMatch[1]) : null,
+        y: yMatch ? parseInt(yMatch[1]) : null
+      });
+    }
+  }
+
+  return fixes;
+}
+
+// Helper: Apply post-process fixes to rendered node
+async function applyPostProcessFixes(nodeId, fixes) {
+  const code = `(async function() {
+    const root = await figma.getNodeByIdAsync('${nodeId}');
+    if (!root) return { error: 'Node not found' };
+
+    const results = [];
+
+    // Helper to find node by name recursively
+    const findByName = (node, name) => {
+      if (node.name === name) return node;
+      if (node.children) {
+        for (const child of node.children) {
+          const found = findByName(child, name);
+          if (found) return found;
+        }
+      }
+      return null;
+    };
+
+    // Helper to find all nodes with layoutWrap
+    const findAllWrap = (node, results = []) => {
+      if (node.layoutWrap === 'WRAP') results.push(node);
+      if (node.children) {
+        for (const child of node.children) {
+          findAllWrap(child, results);
+        }
+      }
+      return results;
+    };
+
+    ${fixes.map((fix, i) => {
+      if (fix.type === 'wrapGap') {
+        if (fix.name) {
+          // Named element - find by name
+          return `
+            // Fix wrapGap for "${fix.name}"
+            const wrapNode${i} = findByName(root, '${fix.name}');
+            if (wrapNode${i} && wrapNode${i}.layoutWrap === 'WRAP') {
+              wrapNode${i}.counterAxisSpacing = ${fix.value};
+              results.push({ type: 'wrapGap', name: '${fix.name}', value: ${fix.value}, applied: true });
+            }
+          `;
+        } else {
+          // No name - apply to first wrap element (root or first found)
+          return `
+            // Fix wrapGap on first wrap element
+            const wrapNodes${i} = findAllWrap(root);
+            if (wrapNodes${i}.length > 0) {
+              wrapNodes${i}[0].counterAxisSpacing = ${fix.value};
+              results.push({ type: 'wrapGap', value: ${fix.value}, applied: true });
+            }
+          `;
+        }
+      } else if (fix.type === 'absolutePosition') {
+        return `
+          // Fix absolute position for "${fix.name}"
+          const absNode${i} = findByName(root, '${fix.name}');
+          if (absNode${i} && absNode${i}.layoutPositioning === 'ABSOLUTE') {
+            ${fix.x !== null ? `absNode${i}.x = ${fix.x};` : ''}
+            ${fix.y !== null ? `absNode${i}.y = ${fix.y};` : ''}
+            results.push({ type: 'absolutePosition', name: '${fix.name}', x: ${fix.x}, y: ${fix.y}, applied: true });
+          }
+        `;
+      }
+      return '';
+    }).join('\n')}
+
+    return { fixes: results };
+  })()`;
+
+  try {
+    if (isDaemonRunning()) {
+      await daemonExec('eval', { code });
+    } else {
+      figmaEvalSync(code);
+    }
+  } catch (e) {
+    // Silent fail - fixes are best-effort
+  }
+}
+
+// Fast JSX parser for simple frames (daemon-based, 4x faster)
+function parseSimpleJsx(jsx) {
+  // Only handles single Frame element, no nesting
+  const frameMatch = jsx.match(/^<Frame\s+([^>]+)\s*\/?>(?:<\/Frame>)?$/);
+  if (!frameMatch) return null;
+
+  const propsStr = frameMatch[1];
+  const props = {};
+
+  // Parse props: name="X" or name={X} or name='X'
+  const propRegex = /(\w+)=(?:\{([^}]+)\}|"([^"]+)"|'([^']+)')/g;
+  let match;
+  while ((match = propRegex.exec(propsStr)) !== null) {
+    const key = match[1];
+    const value = match[2] || match[3] || match[4];
+    props[key] = value;
+  }
+
+  return props;
+}
+
+function generateFigmaCode(props, x, y) {
+  const name = props.name || 'Frame';
+  const w = parseInt(props.w || props.width || 100);
+  const h = parseInt(props.h || props.height || 100);
+  const bg = props.bg || props.fill;
+  const rounded = parseInt(props.rounded || props.cornerRadius || 0);
+  const opacity = props.opacity ? parseFloat(props.opacity) : null;
+
+  let code = `(function() {
+    const f = figma.createFrame();
+    f.name = '${name}';
+    f.resize(${w}, ${h});
+    f.x = ${x};
+    f.y = ${y};`;
+
+  if (rounded > 0) code += `\n    f.cornerRadius = ${rounded};`;
+  if (opacity !== null) code += `\n    f.opacity = ${opacity};`;
+
+  if (bg) {
+    // Parse hex color
+    const hex = bg.replace('#', '');
+    const r = parseInt(hex.substr(0, 2), 16) / 255;
+    const g = parseInt(hex.substr(2, 2), 16) / 255;
+    const b = parseInt(hex.substr(4, 2), 16) / 255;
+    code += `\n    f.fills = [{type:'SOLID', color:{r:${r.toFixed(3)},g:${g.toFixed(3)},b:${b.toFixed(3)}}}];`;
+  }
+
+  code += `\n    return { id: f.id, name: f.name };
+  })()`;
+
+  return code;
+}
+
 program
   .command('render <jsx>')
   .description('Render JSX to Figma (uses figma-use render)')
@@ -4363,6 +4539,7 @@ program
   .option('-x <n>', 'X position')
   .option('-y <n>', 'Y position')
   .option('--no-smart-position', 'Disable auto-positioning')
+  .option('--fast', 'Use fast daemon-based rendering (simple frames only)')
   .action(async (jsx, options) => {
     await checkConnection();
     try {
@@ -4374,8 +4551,25 @@ program
         posX = getNextFreeX();
       }
 
+      // Try fast path for simple frames
+      if (options.fast || (!jsx.includes('><') && !jsx.includes('</Frame><'))) {
+        const simpleProps = parseSimpleJsx(jsx.trim());
+        if (simpleProps && isDaemonRunning()) {
+          const code = generateFigmaCode(simpleProps, posX || 0, posY);
+          const result = await daemonExec('eval', { code });
+          if (result && result.id) {
+            console.log(chalk.green('✓ Rendered: ' + result.id));
+            if (result.name) console.log(chalk.gray('  name: ' + result.name));
+            return;
+          }
+        }
+      }
+
+      // Extract props that figma-use doesn't handle correctly
+      const postProcessFixes = extractPostProcessFixes(jsx);
+
       // Use figma-use render directly - it has full JSX support
-      let cmd = 'npx figma-use render --stdin --json';
+      let cmd = 'figma-use render --stdin --json';
       if (options.parent) cmd += ` --parent "${options.parent}"`;
       if (posX !== undefined) cmd += ` --x ${posX}`;
       cmd += ` --y ${posY}`;
@@ -4390,6 +4584,11 @@ program
       const result = JSON.parse(output.trim());
       console.log(chalk.green('✓ Rendered: ' + result.id));
       if (result.name) console.log(chalk.gray('  name: ' + result.name));
+
+      // Post-process to fix properties figma-use doesn't set correctly
+      if (postProcessFixes.length > 0) {
+        await applyPostProcessFixes(result.id, postProcessFixes);
+      }
     } catch (e) {
       console.log(chalk.red('✗ Render failed: ' + (e.stderr || e.message)));
     }
@@ -4417,7 +4616,7 @@ program
 
       for (const jsx of jsxArray) {
         try {
-          const cmd = `npx figma-use render --stdin --json --x ${currentX} --y ${currentY}`;
+          const cmd = `figma-use render --stdin --json --x ${currentX} --y ${currentY}`;
           const output = execSync(cmd, {
             input: jsx,
             encoding: 'utf8',
@@ -4521,7 +4720,7 @@ program
   .command('eval [code]')
   .description('Execute JavaScript in Figma plugin context')
   .option('-f, --file <path>', 'Run code from file instead of argument')
-  .action((code, options) => {
+  .action(async (code, options) => {
     checkConnection();
     let jsCode = code;
 
@@ -4539,7 +4738,20 @@ program
       return;
     }
 
-    // Call figmaEvalSync directly for cleaner execution
+    // Use async daemon for file-based execution (more reliable for long scripts)
+    if (options.file && isDaemonRunning()) {
+      try {
+        const result = await daemonExec('eval', { code: jsCode });
+        if (result !== undefined && result !== null) {
+          console.log(typeof result === 'object' ? JSON.stringify(result, null, 2) : result);
+        }
+        return;
+      } catch (e) {
+        // Fall through to sync path
+      }
+    }
+
+    // Sync path for inline code or fallback
     try {
       const result = figmaEvalSync(jsCode);
       if (result !== undefined && result !== null) {
@@ -4550,18 +4762,31 @@ program
     }
   });
 
-// Run command - alias for eval --file
+// Run command - alias for eval --file (uses async for better performance)
 program
   .command('run <file>')
   .description('Run JavaScript file in Figma (alias for eval --file)')
-  .action((file) => {
+  .action(async (file) => {
     checkConnection();
     if (!existsSync(file)) {
       console.log(chalk.red('✗ File not found: ' + file));
       return;
     }
     const code = readFileSync(file, 'utf8');
-    figmaUse(`eval "${code.replace(/"/g, '\\"')}"`);
+    try {
+      // Use async daemon path for better performance with long scripts
+      if (isDaemonRunning()) {
+        const result = await daemonExec('eval', { code });
+        if (result !== undefined) {
+          console.log(typeof result === 'object' ? JSON.stringify(result, null, 2) : result);
+        }
+      } else {
+        // Fallback to sync path
+        figmaUse(`eval "${code.replace(/"/g, '\\"')}"`);
+      }
+    } catch (e) {
+      console.log(chalk.red('✗ ' + e.message));
+    }
   });
 
 // ============ PASSTHROUGH ============
