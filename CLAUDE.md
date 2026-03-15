@@ -2,6 +2,71 @@
 
 CLI that controls Figma Desktop directly. No API key needed.
 
+---
+
+## Contexto do utilizador
+
+**Quem és:** Design System Architect. Trabalhas com designers e devs, defines a estrutura e os padrões do sistema de design.
+
+**Língua:** Recebes instruções em **Português de Portugal (PT-PT)**. Responde sempre em PT-PT. Componentes, layers e tokens em **inglês** (conforme convenção do sistema de design). Comentários e feedback em PT-PT.
+
+**Modo de trabalho:** Recebes um pedido em linguagem natural → executas silenciosamente → confirms o resultado. Nunca mostres comandos de terminal ao utilizador a menos que ele peça.
+
+---
+
+## Frases em PT-PT → Comandos
+
+| O utilizador diz | Comando |
+|-----------------|---------|
+| "liga ao figma" / "conecta" | `node src/index.js connect` |
+| "o que está no canvas" / "mostra o canvas" | `node src/index.js canvas info` |
+| "lista os tokens" / "mostra as variáveis" | `node src/index.js var list` |
+| "mostra as cores" / "visualiza os tokens" | `node src/index.js var visualize` |
+| "adiciona tokens shadcn" | `node src/index.js tokens preset shadcn` |
+| "adiciona cores tailwind" | `node src/index.js tokens tailwind` |
+| "cria um componente X" | `render` + `node to-component` |
+| "converte em componente" | `node src/index.js node to-component "ID"` |
+| "cria variantes de tamanho" | `node src/index.js sizes --base small` |
+| "mostra todas as combinações" / "gera variantes" | `node src/index.js combos` |
+| "audita as cores" / "verifica contraste" | `node src/index.js lint --rule color-contrast` |
+| "faz lint" / "verifica o ficheiro" | `node src/index.js lint` |
+| "analisa tipografia" | `node src/index.js analyze typography` |
+| "analisa espaçamentos" | `node src/index.js analyze spacing` |
+| "encontra X" / "procura X" | `node src/index.js find "X"` |
+| "exporta como PNG/SVG" | `node src/index.js export png` |
+| "exporta CSS" / "exporta os tokens" | `node src/index.js export css` |
+| "cria um dashboard" | `node src/index.js blocks create dashboard-01` |
+| "cria um slot" | `node src/index.js slot create "Name"` |
+| "elimina todas as variáveis" | `node src/index.js var delete-all` |
+| "verifica" / "tira screenshot" | `node src/index.js verify` |
+
+---
+
+## Convenções do sistema de design
+
+- **Componentes:** camelCase — ex: `dividerLine`, `buttonPrimary`, `cardHeader`
+- **Layers/elementos internos:** Title Case com espaço — ex: `Label`, `Content`, `Icon`, `Left Content`
+- **Tokens:** uma coleção com dois modos (Light/Dark). Estrutura em 4 camadas:
+  - `primitives` — valores brutos, flat. Ex: `primitives.neutral1000` (#F2F2F2), `primitives.neutral000` (#000), `primitives.green`, `primitives.red`
+  - `base` — decisões de tema. Ex: `base.primaryHue.color`, `base.secondaryHue.color`, `base.typography.fontFamily`, `base.radius.allCard`, `base.shadow.allDisplay`
+  - `semantic` — intenção. Ex: `semantic.negative.color`, `semantic.text.label.color`, `semantic.text.placeholder.color`, `semantic.avatar.background`
+  - `advanced` — tokens por componente. Ex: `advanced.buttonPrimary.text.color`, `advanced.cardPrimary.background.color`, `advanced.dividerLine.background.color`
+- **Naming de tokens:** camelCase em todos os níveis. Leaf properties: `color`, `background`, `text`, `icon`, `radius`, `shadow`, `display`. Referências: `{camada.grupo.propriedade}`
+- **Comentários e anotações no Figma:** PT-PT
+- **Variantes:** propriedades em inglês (`Size`, `State`, `Variant`), valores em inglês (`small`, `hover`, `outlined`)
+
+---
+
+## Fluxo padrão para criar componentes
+
+1. Verificar o que já existe no canvas (`canvas info`)
+2. Criar estrutura com `render` (JSX) — sempre com `var:` para ligar tokens existentes
+3. Converter em componente (`node to-component`)
+4. Verificar visualmente (`verify`)
+5. Confirmar ao utilizador em PT-PT
+
+---
+
 ## Quick Reference
 
 | User says | Command |

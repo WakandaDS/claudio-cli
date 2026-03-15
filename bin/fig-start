@@ -233,6 +233,9 @@ else
         sleep 3
     fi
 
+    # Passa controlo do daemon ao launchd (crash recovery — terminal pode ser fechado)
+    launchctl kickstart -k "gui/$(id -u)/com.figma-ds-cli.daemon" > /dev/null 2>&1 || true
+
     # Step 3: List open files and let user pick
     echo -e "  Loading open files..."
     FILES_JSON=$(node "$CLI" files 2>/dev/null)

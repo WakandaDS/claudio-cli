@@ -16,6 +16,7 @@ import { FigmaClient } from './figma-client.js';
 import { isPatched, patchFigma, unpatchFigma, getFigmaCommand, getCdpPort, getFigmaBinaryPath } from './figma-patch.js';
 import { listComponents, getComponent, getAllComponents, VISUAL_COMPONENTS } from './shadcn.js';
 import { listBlocks, getBlock } from './blocks/index.js';
+import select from '@inquirer/select';
 
 // Fix zsh shell escaping: zsh escapes ! to \! even in single quotes
 function unescapeShell(str) {
@@ -7533,6 +7534,110 @@ blocksCmd
       spinner.succeed(`Created ${block.name} (${nodeId})`);
     } catch (e) {
       spinner.fail(`Failed to create ${block.name}: ${e.message}`);
+    }
+  });
+
+// ============ FLAG ============
+
+program
+  .command('flag [nodeId]')
+  .description('Add an error annotation flag to a node (or current selection)')
+  .option('--error <message>', 'Error message')
+  .option('--token <token>', 'Token name that is wrong (shown in bold)')
+  .option('--suggestion <suggestion>', 'Suggested fix')
+  .option('--prop <prop>', 'Property to link annotation to (fills, strokes, opacity, etc.)')
+  .option('--category <category>', 'Category prefix (e.g. Claude)', 'Claude')
+  .option('--clear', 'Clear all annotations from node')
+  .action(async (nodeId, options) => {
+    await checkConnection();
+
+    const params = {
+      nodeId: nodeId || null,
+      error: options.error || '',
+      token: options.token || null,
+      suggestion: options.suggestion || null,
+      prop: options.prop || null,
+      clear: !!options.clear,
+    };
+
+    const code = `(async function() {
+      var params = ${JSON.stringify(params)};
+
+      var nd = params.nodeId
+        ? figma.getNodeById(params.nodeId)
+        : figma.currentPage.selection[0];
+
+      if (!nd) return { error: 'Nenhum node encontrado. Seleciona um layer ou passa um ID.' };
+
+      if (params.clear) {
+        nd.annotations = [];
+        return { ok: true, cleared: nd.name };
+      }
+
+      // Navigate to main component if instance
+      var target = nd;
+      var usedMainComponent = false;
+      if (nd.type === 'INSTANCE' && nd.mainComponent) {
+        target = nd.mainComponent;
+        usedMainComponent = true;
+      }
+
+      // Build labelMarkdown with bold token + bold Sugestão
+      var labelMd = params.token
+        ? '**' + params.token + '**' + (params.error ? ' — ' + params.error : '')
+        : params.error;
+
+      if (params.suggestion) {
+        labelMd += '\\n\\n**Sugestão:** ' + params.suggestion;
+      }
+
+      var CLAUDE_CATEGORY_ID = '59478:0';
+
+      // Try with property link first
+      var withProperty = false;
+      if (params.prop) {
+        try {
+          target.annotations = [{ labelMarkdown: labelMd, categoryId: CLAUDE_CATEGORY_ID, properties: [{ type: params.prop }] }];
+          withProperty = true;
+        } catch(e) {
+          // Property not valid for this node type — fall through
+        }
+      }
+
+      // Fallback: annotation without property link
+      if (!withProperty) {
+        target.annotations = [{ labelMarkdown: labelMd, categoryId: CLAUDE_CATEGORY_ID }];
+      }
+
+      return {
+        ok: true,
+        annotatedNode: target.name,
+        annotatedType: target.type,
+        usedMainComponent: usedMainComponent,
+        withProperty: withProperty,
+        prop: params.prop || null,
+      };
+    })()`;
+
+    try {
+      const result = await daemonExec('eval', { code }, 15000);
+
+      if (result.error) {
+        console.log(chalk.red(`✗ ${result.error}`));
+        return;
+      }
+      if (result.cleared) {
+        console.log(chalk.green(`✓ Anotações removidas de "${result.cleared}"`));
+        return;
+      }
+
+      let msg = chalk.green(`✓ Flag adicionada em "${result.annotatedNode}"`);
+      if (result.usedMainComponent) msg += chalk.dim(' (componente-mãe)');
+      if (result.withProperty) msg += chalk.dim(` → ligada a: ${result.prop}`);
+      else if (params.prop) msg += chalk.yellow(` (propriedade "${params.prop}" não suportada neste tipo — label sem link)`);
+      console.log(msg);
+    } catch (e) {
+      console.log(chalk.red(`✗ ${e.message}`));
     }
   });
 
