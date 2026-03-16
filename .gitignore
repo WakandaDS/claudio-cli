@@ -4,3 +4,14 @@ DEV-NOTES.md
 node_modules/
 .figma-client-*.mjs
 screenshot.png
+
+# Configuração pessoal do Claude (local a cada máquina)
+.claude/projects/
+.claude/worktrees/
+
+# Editor pessoal
+.obsidian/
+
+# Ficheiros temporários
+*.base
+nul

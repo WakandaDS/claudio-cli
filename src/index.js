@@ -5,7 +5,7 @@ import chalk from 'chalk';
 import ora from 'ora';
 import { execSync, spawn } from 'child_process';
 import { randomBytes } from 'crypto';
-import { existsSync, readFileSync, writeFileSync, mkdirSync, unlinkSync } from 'fs';
+import { existsSync, readFileSync, writeFileSync, appendFileSync, mkdirSync, unlinkSync } from 'fs';
 import { fileURLToPath, pathToFileURL } from 'url';
 import { dirname, join } from 'path';
 import { createInterface } from 'readline';
@@ -7639,6 +7639,308 @@ program
     } catch (e) {
       console.log(chalk.red(`✗ ${e.message}`));
     }
+  });
+
+// ============ AUDIT ============
+
+program
+  .command('audit')
+  .description('Scan the current Figma page and annotate layers with rule violations')
+  .option('--rules <path>', 'Path to rules markdown file', 'audit/rules.md')
+  .option('--report <path>', 'Path to backlog markdown file', 'audit/backlog.md')
+  .option('--clear', 'Clear all Claude audit annotations from current page')
+  .option('--all-pages', 'Scan all pages in the document')
+  .option('--page <name>', 'Scan a specific page by name')
+  .option('--list', 'List active and inactive rules')
+  .action(async (options) => {
+    await checkConnection();
+
+    // ── LIST MODE ────────────────────────────────────────────────────
+    if (options.list) {
+      const rulesPath = options.rules;
+      if (!existsSync(rulesPath)) {
+        console.log(chalk.yellow(`  Ficheiro não encontrado: ${rulesPath}`));
+        return;
+      }
+      const content = readFileSync(rulesPath, 'utf8');
+      let inCodeBlock = false;
+      let active = 0, inactive = 0;
+      console.log('');
+      content.split('\n').forEach(line => {
+        if (line.trimStart().startsWith('```')) { inCodeBlock = !inCodeBlock; return; }
+        if (inCodeBlock) return;
+        const checkboxMatch = line.match(/^-\s*\[( |x)\]\s*(.*)/i);
+        if (!checkboxMatch) return;
+        const disabled = checkboxMatch[1] === ' ';
+        const match = checkboxMatch[2].match(/\[(.*?)\]\s*\[(.*?)\]\s*regex:\s*(.+?)(?:\s+type:\s*(\S+))?(?:\s+variant:\s*(\S+))?(?:\s+\[\[.*?\]\])?$/);
+        if (!match) return;
+        const id = match[1].trim();
+        const msg = match[2].trim();
+        const type = match[4] ? ` · type: ${match[4]}` : '';
+        const variant = match[5] ? ` · variant: ${match[5]}` : '';
+        if (disabled) {
+          console.log(chalk.dim(`  ○ [${id}] ${msg}${type}${variant}`) + chalk.red(' (off)'));
+          inactive++;
+        } else {
+          console.log(chalk.green(`  ● [${id}] ${msg}${type}${variant}`));
+          active++;
+        }
+      });
+      console.log('');
+      console.log(chalk.dim(`  ${active} ativa(s)  ${inactive} desativada(s)\n`));
+      return;
+    }
+
+    // ── CLEAR MODE ──────────────────────────────────────────────────
+    if (options.clear) {
+      const spinner = ora('A limpar anotações de auditoria...').start();
+      const clearCode = `(async () => {
+        const nodes = figma.currentPage.findAll(() => true);
+        let count = 0;
+        for (const node of nodes) {
+          if (node.annotations && node.annotations.length > 0) {
+            node.annotations = [];
+            count++;
+          }
+        }
+        return { cleared: count };
+      })()`;
+      try {
+        const result = await daemonExec('eval', { code: clearCode }, 30000);
+        spinner.succeed(`${result.cleared} layers limpas`);
+      } catch (e) {
+        spinner.fail(e.message);
+      }
+      return;
+    }
+
+    // ── LOAD RULES ───────────────────────────────────────────────────
+    let rules = [
+      {
+        id: 'ERR_UNNAMED',
+        pattern: '^(Frame|Group|Rectangle|Ellipse|Line|Text|Vector|Component|Instance)\\s\\d+$',
+        message: 'Layer sem nome semântico',
+        suggestion: 'Usa um nome descritivo que reflita o conteúdo ou função (ex: "Card Header", "Icon Button").'
+      },
+      {
+        id: 'ERR_TEMP',
+        pattern: '^(temp|tmp|test|WIP|TODO|xxx|old|copy|copy of|untitled)',
+        message: 'Layer temporária ou por organizar',
+        suggestion: 'Remove ou renomeia esta layer antes da entrega.'
+      }
+    ];
+
+    if (existsSync(options.rules)) {
+      try {
+        const content = readFileSync(options.rules, 'utf8');
+        const custom = [];
+        let inCodeBlock = false;
+        content.split('\n').forEach(line => {
+          if (line.trimStart().startsWith('```')) { inCodeBlock = !inCodeBlock; return; }
+          if (inCodeBlock) return;
+          const checkboxMatch = line.match(/^-\s*\[( |x)\]\s*(.*)/i);
+          if (!checkboxMatch || checkboxMatch[1] === ' ') return; // skip disabled
+          const match = checkboxMatch[2].match(/\[(.*?)\]\s*\[(.*?)\]\s*regex:\s*(.+?)(?:\s+type:\s*(\S+))?(?:\s+variant:\s*(\S+))?(?:\s+\[\[.*?\]\])?$/);
+          if (match) {
+            custom.push({
+              id: match[1].trim(),
+              message: match[2].trim(),
+              pattern: match[3].trim(),
+              nodeType: match[4] ? match[4].trim().toUpperCase() : null,
+              variant: match[5] ? match[5].trim().toLowerCase() : null,
+              suggestion: ''
+            });
+          }
+        });
+        if (custom.length > 0) {
+          rules = custom;
+          console.log(chalk.dim(`  ${rules.length} regras carregadas de ${options.rules}`));
+        }
+      } catch (e) {
+        console.log(chalk.yellow(`  Não foi possível ler ${options.rules} — a usar regras padrão`));
+      }
+    } else {
+      console.log(chalk.dim(`  Ficheiro de regras não encontrado — a usar regras padrão`));
+      console.log(chalk.dim(`  Cria ${options.rules} para personalizar`));
+    }
+
+    // ── SCAN & ANNOTATE ──────────────────────────────────────────────
+    const allPages = !!options.allPages;
+    const specificPage = options.page || null;
+    const spinner = ora(allPages ? 'A auditar todo o documento...' : specificPage ? `A auditar página "${specificPage}"...` : 'A auditar página...').start();
+
+    const auditCode = `(async () => {
+      const rules = ${JSON.stringify(rules)};
+      const CATEGORY_ID = '59478:0';
+      const results = [];
+      const fileKey = figma.fileKey || '';
+      const fileName = encodeURIComponent(figma.root.name);
+      const allPages = ${allPages};
+      const specificPage = ${JSON.stringify(specificPage)};
+
+      const supported = ['FRAME','GROUP','COMPONENT','COMPONENT_SET','INSTANCE','RECTANGLE','ELLIPSE','TEXT','VECTOR','LINE','POLYGON','STAR'];
+      const ruleTypes = [...new Set(rules.filter(r => r.nodeType).map(r => r.nodeType))];
+      const filterTypes = ruleTypes.length === rules.length ? ruleTypes : supported;
+      const allNodes = [];
+      let pagesToScan = [figma.currentPage];
+      if (allPages) pagesToScan = figma.root.children.filter(p => p.type === 'PAGE');
+      else if (specificPage) {
+        const found = figma.root.children.find(p => p.type === 'PAGE' && p.name.toLowerCase().includes(specificPage.toLowerCase()));
+        if (found) pagesToScan = [found];
+      }
+      for (const page of pagesToScan) {
+        const nodes = page.findAll(n => {
+          if (!filterTypes.includes(n.type)) return false;
+          if ((n.type === 'FRAME' || n.type === 'GROUP') && (!n.children || n.children.length === 0)) return false;
+          return true;
+        });
+        nodes.forEach(n => { n.__pageName = page.name; allNodes.push(n); });
+      }
+
+      for (const node of allNodes) {
+        for (const rule of rules) {
+          if (rule.nodeType && node.type !== rule.nodeType) continue;
+          if (!new RegExp(rule.pattern, 'i').test(node.name)) continue;
+          if (rule.variant) {
+            const props = node.variantGroupProperties || {};
+            const values = Object.values(props).flatMap(p => p.values || []).map(v => v.toLowerCase());
+            if (!values.includes(rule.variant)) continue;
+          }
+
+          const existing = node.annotations || [];
+          if (existing.some(a => a.label && a.label.includes(rule.id))) continue;
+
+          // Walk up to direct child of PAGE for reliable navigation
+          let topNode = node;
+          while (topNode.parent && topNode.parent.type !== 'PAGE') {
+            topNode = topNode.parent;
+          }
+          const nodeId = topNode.id.replace(':', '-');
+          const deepLink = 'figma://file/' + fileKey + '?node-id=' + nodeId;
+
+          try {
+            node.annotations = [...existing, {
+              labelMarkdown: '**[' + rule.id + ']** ' + rule.message + (rule.suggestion ? '\\n\\n' + rule.suggestion : ''),
+              categoryId: CATEGORY_ID
+            }];
+            results.push({ id: node.id, name: node.name, page: node.__pageName || figma.currentPage.name, rule: rule.id, message: rule.message, link: deepLink });
+          } catch (err) {
+            results.push({ id: node.id, name: node.name, page: node.__pageName || figma.currentPage.name, rule: rule.id, error: err.message, link: deepLink });
+          }
+        }
+      }
+      return results;
+    })()`;
+
+    let results;
+    try {
+      results = await daemonExec('eval', { code: auditCode }, 300000);
+      spinner.succeed(`${results.length} layer(s) anotada(s)`);
+    } catch (e) {
+      spinner.fail(e.message);
+      return;
+    }
+
+    if (results.length === 0) {
+      console.log(chalk.green('\n  Nenhuma violação encontrada — página limpa.\n'));
+      return;
+    }
+
+    // Print results
+    console.log('');
+    results.forEach(r => {
+      if (r.error) {
+        console.log(chalk.red(`  ✗ ${r.name} — ${r.error}`));
+      } else {
+        console.log(chalk.yellow(`  ⚑ `) + chalk.white(`${r.name} `) + chalk.dim(`[${r.rule}] ${r.message}`));
+      }
+    });
+    console.log('');
+
+    // ── WRITE BACKLOG ─────────────────────────────────────────────────
+    if (options.report) {
+      try {
+        const dir = options.report.split('/').slice(0, -1).join('/');
+        if (dir && !existsSync(dir)) mkdirSync(dir, { recursive: true });
+
+        const date = new Date().toISOString().split('T')[0];
+        const fileExists = existsSync(options.report);
+        let content = '';
+
+        if (!fileExists) {
+          content += `# Audit Backlog\n\n`;
+        } else {
+          content += `\n`;
+        }
+
+        results.filter(r => !r.error).forEach(r => {
+          content += `- [ ] **${r.name}** — ${r.message} · \`${r.page}\` · \`${date}\` · [Abrir no Figma](${r.link})\n`;
+        });
+
+        if (fileExists) {
+          appendFileSync(options.report, content);
+        } else {
+          writeFileSync(options.report, content);
+        }
+        console.log(chalk.dim(`  Backlog atualizado em ${options.report}\n`));
+      } catch (e) {
+        console.log(chalk.yellow(`  Não foi possível escrever o backlog: ${e.message}\n`));
+      }
+    }
+  });
+
+// ============ ONBOARDING ============
+
+program
+  .command('onboarding')
+  .description('Configura o Claude localmente para este projecto (primeira vez)')
+  .action(async () => {
+    const home = homedir();
+    const claudeDir = join(home, '.claude');
+    const globalClaude = join(claudeDir, 'CLAUDE.md');
+    const memoryDir = join(claudeDir, 'projects', process.cwd().replace(/\//g, '-'), 'memory');
+    const templatePath = join(__dirname, '..', 'onboarding', 'claude-global-template.md');
+
+    console.log('');
+    console.log(chalk.bold('  figma-cli — Setup'));
+    console.log('');
+
+    // 1. ~/.claude/CLAUDE.md
+    if (existsSync(globalClaude)) {
+      console.log(chalk.green('  ✓ ~/.claude/CLAUDE.md já existe — mantido sem alterações'));
+    } else {
+      if (existsSync(templatePath)) {
+        const template = readFileSync(templatePath, 'utf8');
+        if (!existsSync(claudeDir)) mkdirSync(claudeDir, { recursive: true });
+        writeFileSync(globalClaude, template, 'utf8');
+        console.log(chalk.green('  ✓ ~/.claude/CLAUDE.md criado a partir do template'));
+        console.log(chalk.yellow('    → Abre ~/.claude/CLAUDE.md e preenche os campos TODO'));
+      } else {
+        console.log(chalk.yellow('  ⚠ Template não encontrado em onboarding/claude-global-template.md'));
+      }
+    }
+
+    // 2. Pasta de memórias local
+    if (!existsSync(memoryDir)) {
+      mkdirSync(memoryDir, { recursive: true });
+      console.log(chalk.green('  ✓ Pasta de memórias criada'));
+    } else {
+      console.log(chalk.green('  ✓ Pasta de memórias já existe'));
+    }
+
+    // 3. npm install
+    console.log(chalk.dim('  → A verificar dependências...'));
+    try {
+      execSync('npm install', { stdio: 'pipe', cwd: join(__dirname, '..') });
+      console.log(chalk.green('  ✓ Dependências instaladas'));
+    } catch (e) {
+      console.log(chalk.yellow('  ⚠ npm install falhou — corre manualmente'));
+    }
+
+    console.log('');
+    console.log(chalk.bold('  Pronto! Próximo passo:'));
+    console.log(chalk.cyan('  node src/index.js connect') + chalk.dim(' — liga ao Figma Desktop'));
+    console.log('');
   });
 
 program.parse();
