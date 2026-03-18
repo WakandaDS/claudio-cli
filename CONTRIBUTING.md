@@ -27,8 +27,8 @@ main          ← código e conhecimento partilhado por toda a equipa
 ### 1. Clona o repositório e cria a tua branch
 
 ```bash
-git clone https://github.com/WakandaDS/bruno-figma-cli.git
-cd bruno-figma-cli
+git clone https://github.com/WakandaDS/claudio-cli.git
+cd claudio-cli
 git checkout -b [o-teu-nome]
 npm install
 ```

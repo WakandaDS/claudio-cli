@@ -57,6 +57,4 @@
 - Component property names get `#uniqueId` suffix (e.g., `ButtonText#0:1`)
 
 ## Remote Setup
-- `origin` = figma-cli-private (github.com/silships/figma-cli-private)
-- `public` = figma-cli (github.com/silships/figma-cli)
-- Always push to both
+- `origin` = WakandaDS/claudio-cli

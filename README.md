@@ -1,7 +1,7 @@
-# figma-ds-cli
+# claudio-cli
 
 <p align="center">
-  <a href="https://intodesignsystems.com"><img src="https://img.shields.io/badge/Into_Design_Systems-intodesignsystems.com-ff6b35" alt="Into Design Systems"></a>
+  <a href="https://github.com/WakandaDS/claudio-cli"><img src="https://img.shields.io/badge/WakandaDS-bruno--figma--cli-ff6b35" alt="WakandaDS"></a>
   <img src="https://img.shields.io/badge/Figma-Desktop-purple" alt="Figma Desktop">
   <img src="https://img.shields.io/badge/No_API_Key-Required-green" alt="No API Key">
   <img src="https://img.shields.io/badge/Claude_Code-Ready-blue" alt="Claude Code">
@@ -153,8 +153,8 @@ This project includes a `CLAUDE.md` file that Claude reads automatically. It con
 ## Setup
 
 ```bash
-git clone https://github.com/silships/figma-cli.git
-cd figma-cli
+git clone https://github.com/WakandaDS/claudio-cli.git
+cd claudio-cli
 npm install
 npm run setup-alias
 source ~/.zshrc
@@ -613,22 +613,7 @@ Token is stored at `~/.figma-ds-cli/.daemon-token` with owner-only permissions (
 
 ## Author
 
-**[Sil Bormueller](https://www.linkedin.com/in/silbormueller/)** -- [intodesignsystems.com](https://intodesignsystems.com)
-
-## Powered By
-
-This CLI is built on top of **[figma-use](https://github.com/dannote/figma-use)** by [dannote](https://github.com/dannote) -- an excellent Figma CLI with JSX rendering, XPath queries, design linting, and much more.
-
-In **Yolo Mode**, we use figma-use for:
-- JSX rendering (`render` command)
-- Node operations (`node tree`, `node to-component`, etc.)
-- Design analysis (`analyze colors`, `analyze typography`)
-- Design linting (`lint`)
-- And many other features
-
-In **Safe Mode**, all commands use native Figma Plugin API implementations, so figma-use is not required.
-
-**Big thanks to dannote for figma-use!**
+**WakandaDS** — [github.com/WakandaDS](https://github.com/WakandaDS)
 
 ## License
 
