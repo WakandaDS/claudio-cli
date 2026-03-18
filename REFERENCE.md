@@ -1,27 +1,27 @@
-# claudio-cli Command Reference
+# Referencia de Comandos claudio-cli
 
-Full command reference for the Figma CLI. For quick start, see CLAUDE.md.
+Referencia completa de comandos para o CLI do Figma. Para inicio rapido, consulta o CLAUDE.md.
 
-## Design Tokens & Variables
+## Tokens de Design e Variaveis
 
-### Create Design Systems
+### Criar Sistemas de Design
 
 ```bash
-node src/index.js tokens ds              # IDS Base colors
-node src/index.js tokens tailwind        # Tailwind 22 color families (242 vars)
-node src/index.js tokens spacing         # Spacing tokens
+node src/index.js tokens ds              # Cores base IDS
+node src/index.js tokens tailwind        # 22 familias de cores Tailwind (242 vars)
+node src/index.js tokens spacing         # Tokens de espacamento
 ```
 
-### Manage Variables
+### Gerir Variaveis
 
 ```bash
-node src/index.js var list               # Show all variables
-node src/index.js var list -t COLOR      # Filter by type
-node src/index.js var visualize          # Show colors on canvas
+node src/index.js var list               # Mostrar todas as variaveis
+node src/index.js var list -t COLOR      # Filtrar por tipo
+node src/index.js var visualize          # Mostrar cores no canvas
 node src/index.js var create "name" -c "ColId" -t COLOR -v "#3b82f6"
 ```
 
-### Bind Variables
+### Associar Variaveis
 
 ```bash
 node src/index.js bind fill "primary/500"
@@ -29,12 +29,12 @@ node src/index.js bind stroke "border/default"
 node src/index.js bind radius "radius/md"
 node src/index.js bind gap "spacing/md"
 node src/index.js bind padding "spacing/lg"
-node src/index.js bind list              # List available variables
+node src/index.js bind list              # Listar variaveis disponiveis
 ```
 
-## Create Elements
+## Criar Elementos
 
-### Quick Primitives
+### Primitivos Rapidos
 
 ```bash
 node src/index.js create rect "Card" -w 320 -h 200 --fill "#fff" --radius 12
@@ -48,9 +48,9 @@ node src/index.js create group "Header"
 node src/index.js create component "Button"
 ```
 
-### Create with Variable Binding (Fast)
+### Criar com Associacao de Variaveis (Rapido)
 
-Use `var:name` syntax to bind shadcn variables at creation time:
+Usa a sintaxe `var:name` para associar variaveis shadcn no momento da criacao:
 
 ```bash
 node src/index.js create rect "Card" --fill "var:card" --stroke "var:border"
@@ -62,7 +62,7 @@ node src/index.js create autolayout "Container" --fill "var:muted"
 node src/index.js create icon lucide:star -c "var:primary"
 ```
 
-### Render with JSX
+### Render com JSX
 
 ```bash
 node src/index.js render '<Frame name="Card" w={320} h={180} bg="#fff" rounded={16} flex="col" gap={8} p={24}>
@@ -71,9 +71,9 @@ node src/index.js render '<Frame name="Card" w={320} h={180} bg="#fff" rounded={
 </Frame>'
 ```
 
-### Render with Variable Binding (Fast)
+### Render com Associacao de Variaveis (Rapido)
 
-Use `var:name` syntax to bind shadcn variables at creation time (no separate bind commands needed):
+Usa a sintaxe `var:name` para associar variaveis shadcn no momento da criacao (sem necessidade de comandos bind separados):
 
 ```bash
 node src/index.js render '<Frame name="Card" w={320} h={180} bg="var:card" stroke="var:border" rounded={16} flex="col" gap={8} p={24}>
@@ -85,9 +85,9 @@ node src/index.js render '<Frame name="Card" w={320} h={180} bg="var:card" strok
 </Frame>'
 ```
 
-Variables: `background`, `foreground`, `card`, `primary`, `secondary`, `muted`, `accent`, `border`, and their `-foreground` variants.
+Variaveis: `background`, `foreground`, `card`, `primary`, `secondary`, `muted`, `accent`, `border`, e as suas variantes `-foreground`.
 
-### Render Batch (Multiple Frames)
+### Render Batch (Multiplos Frames)
 
 ```bash
 node src/index.js render-batch '[
@@ -96,124 +96,124 @@ node src/index.js render-batch '[
 ]' -d row -g 40
 ```
 
-Options: `-d row|col` (direction), `-g <n>` (gap)
+Opcoes: `-d row|col` (direcao), `-g <n>` (espacamento)
 
-## Modify Elements
+## Modificar Elementos
 
 ```bash
-node src/index.js set fill "#3b82f6"           # Change fill (hex)
-node src/index.js set fill "var:primary"       # Bind fill to variable (fast)
-node src/index.js set fill "#3b82f6" -n "1:234" # On specific node
-node src/index.js set stroke "#e4e4e7" -w 1    # Add stroke (hex)
-node src/index.js set stroke "var:border"      # Bind stroke to variable
-node src/index.js set radius 12                # Corner radius
-node src/index.js set size 320 200             # Resize
-node src/index.js set pos 100 100              # Move
-node src/index.js set opacity 0.5              # Opacity
-node src/index.js set autolayout row -g 8 -p 16 # Apply auto-layout
-node src/index.js set name "Header"            # Rename
+node src/index.js set fill "#3b82f6"           # Alterar preenchimento (hex)
+node src/index.js set fill "var:primary"       # Associar preenchimento a variavel (rapido)
+node src/index.js set fill "#3b82f6" -n "1:234" # Num no especifico
+node src/index.js set stroke "#e4e4e7" -w 1    # Adicionar contorno (hex)
+node src/index.js set stroke "var:border"      # Associar contorno a variavel
+node src/index.js set radius 12                # Raio dos cantos
+node src/index.js set size 320 200             # Redimensionar
+node src/index.js set pos 100 100              # Mover
+node src/index.js set opacity 0.5              # Opacidade
+node src/index.js set autolayout row -g 8 -p 16 # Aplicar auto-layout
+node src/index.js set name "Header"            # Renomear
 ```
 
-## Layout & Sizing
+## Layout e Dimensionamento
 
 ```bash
-node src/index.js sizing hug                   # Hug contents
-node src/index.js sizing fill                  # Fill container
-node src/index.js sizing fixed 320 200         # Fixed size
-node src/index.js padding 16                   # All sides
+node src/index.js sizing hug                   # Ajustar ao conteudo
+node src/index.js sizing fill                  # Preencher contentor
+node src/index.js sizing fixed 320 200         # Tamanho fixo
+node src/index.js padding 16                   # Todos os lados
 node src/index.js padding 16 24                # Vertical, horizontal
-node src/index.js gap 16                       # Set gap
-node src/index.js align center                 # Align items
+node src/index.js gap 16                       # Definir espacamento
+node src/index.js align center                 # Alinhar elementos
 ```
 
-## Find & Select
+## Encontrar e Selecionar
 
 ```bash
-node src/index.js find "Button"                # Find by name
-node src/index.js find "Card" -t FRAME         # Filter by type
-node src/index.js select "1:234"               # Select node
-node src/index.js get                          # Get selection props
-node src/index.js get "1:234"                  # Get specific node
+node src/index.js find "Button"                # Encontrar por nome
+node src/index.js find "Card" -t FRAME         # Filtrar por tipo
+node src/index.js select "1:234"               # Selecionar no
+node src/index.js get                          # Obter propriedades da selecao
+node src/index.js get "1:234"                  # Obter no especifico
 ```
 
-## Canvas Operations
+## Operacoes de Canvas
 
 ```bash
-node src/index.js canvas info                  # What's on canvas
-node src/index.js canvas next                  # Next free position
-node src/index.js arrange -g 100               # Arrange frames
-node src/index.js arrange -g 100 -c 3          # 3 columns
+node src/index.js canvas info                  # O que esta no canvas
+node src/index.js canvas next                  # Proxima posicao livre
+node src/index.js arrange -g 100               # Organizar frames
+node src/index.js arrange -g 100 -c 3          # 3 colunas
 ```
 
-## Duplicate & Delete
+## Duplicar e Eliminar
 
 ```bash
-node src/index.js duplicate                    # Duplicate selection
-node src/index.js dup "1:234" --offset 50      # With offset
-node src/index.js delete                       # Delete selection
-node src/index.js delete "1:234"               # Delete by ID
+node src/index.js duplicate                    # Duplicar selecao
+node src/index.js dup "1:234" --offset 50      # Com desvio
+node src/index.js delete                       # Eliminar selecao
+node src/index.js delete "1:234"               # Eliminar por ID
 ```
 
-## Node Operations
+## Operacoes de Nos
 
 ```bash
-node src/index.js node tree                    # Show tree structure
-node src/index.js node tree "1:234" -d 5       # Deeper depth
-node src/index.js node bindings                # Show variable bindings
-node src/index.js node to-component "1:234"    # Convert to component
-node src/index.js node delete "1:234"          # Delete by ID
+node src/index.js node tree                    # Mostrar estrutura em arvore
+node src/index.js node tree "1:234" -d 5       # Maior profundidade
+node src/index.js node bindings                # Mostrar associacoes de variaveis
+node src/index.js node to-component "1:234"    # Converter em componente
+node src/index.js node delete "1:234"          # Eliminar por ID
 ```
 
 ## Slots
 
-Figma's native slots feature for flexible content areas in components.
+Funcionalidade nativa de slots do Figma para areas de conteudo flexiveis em componentes.
 
 ```bash
-node src/index.js slot create "Content"        # Create slot on component
+node src/index.js slot create "Content"        # Criar slot no componente
 node src/index.js slot create "Actions" --flex row --gap 8 --padding 16
-node src/index.js slot list                    # List slots in component
-node src/index.js slot list "1:234"            # List by component ID
-node src/index.js slot preferred "Slot#1:2" "comp-id-1" "comp-id-2"  # Set preferred
-node src/index.js slot reset                   # Reset slot to defaults
-node src/index.js slot add "slot-id" --component "comp-id"  # Add to slot
-node src/index.js slot add "slot-id" --frame   # Add empty frame
-node src/index.js slot add "slot-id" --text "Hello"  # Add text
+node src/index.js slot list                    # Listar slots no componente
+node src/index.js slot list "1:234"            # Listar por ID do componente
+node src/index.js slot preferred "Slot#1:2" "comp-id-1" "comp-id-2"  # Definir preferidos
+node src/index.js slot reset                   # Repor slot para valores predefinidos
+node src/index.js slot add "slot-id" --component "comp-id"  # Adicionar ao slot
+node src/index.js slot add "slot-id" --frame   # Adicionar frame vazio
+node src/index.js slot add "slot-id" --text "Hello"  # Adicionar texto
 ```
 
-## Export
+## Exportar
 
 ```bash
-node src/index.js export css                   # Variables as CSS
-node src/index.js export tailwind              # Tailwind config
-node src/index.js export screenshot -o out.png # Screenshot (selection or page)
-node src/index.js export screenshot -s 2 -f png # 2x scale PNG
-node src/index.js export screenshot -f svg     # SVG format
-node src/index.js export node "1:234" -o card.png         # Export node by ID
-node src/index.js export node "1:234" -s 2 -f png         # 2x scale PNG
-node src/index.js export node "1:234" -f svg -o card.svg  # SVG export
-node src/index.js export-jsx "1:234"           # Export as JSX
+node src/index.js export css                   # Variaveis como CSS
+node src/index.js export tailwind              # Configuracao Tailwind
+node src/index.js export screenshot -o out.png # Captura de ecra (selecao ou pagina)
+node src/index.js export screenshot -s 2 -f png # PNG com escala 2x
+node src/index.js export screenshot -f svg     # Formato SVG
+node src/index.js export node "1:234" -o card.png         # Exportar no por ID
+node src/index.js export node "1:234" -s 2 -f png         # PNG com escala 2x
+node src/index.js export node "1:234" -f svg -o card.svg  # Exportar SVG
+node src/index.js export-jsx "1:234"           # Exportar como JSX
 node src/index.js export-jsx "1:234" -o Card.jsx --pretty
-node src/index.js export-storybook "1:234"     # Storybook stories
+node src/index.js export-storybook "1:234"     # Historias Storybook
 ```
 
-## Analysis & Linting
+## Analise e Linting
 
 ```bash
-node src/index.js lint                         # Check all rules
-node src/index.js lint --fix                   # Auto-fix
-node src/index.js lint --rule color-contrast   # Specific rule
-node src/index.js lint --preset accessibility  # Use preset
-node src/index.js analyze colors               # Color usage
-node src/index.js analyze typography           # Typography
-node src/index.js analyze spacing              # Spacing
-node src/index.js analyze clusters             # Find patterns
+node src/index.js lint                         # Verificar todas as regras
+node src/index.js lint --fix                   # Corrigir automaticamente
+node src/index.js lint --rule color-contrast   # Regra especifica
+node src/index.js lint --preset accessibility  # Usar preset
+node src/index.js analyze colors               # Utilizacao de cores
+node src/index.js analyze typography           # Tipografia
+node src/index.js analyze spacing              # Espacamento
+node src/index.js analyze clusters             # Encontrar padroes
 ```
 
-Lint rules: `no-default-names`, `no-deeply-nested`, `no-empty-frames`, `prefer-auto-layout`, `no-hardcoded-colors`, `color-contrast`, `touch-target-size`, `min-text-size`
+Regras de lint: `no-default-names`, `no-deeply-nested`, `no-empty-frames`, `prefer-auto-layout`, `no-hardcoded-colors`, `color-contrast`, `touch-target-size`, `min-text-size`
 
 Presets: `recommended`, `strict`, `accessibility`, `design-system`
 
-## XPath Queries
+## Consultas XPath
 
 ```bash
 node src/index.js raw query "//FRAME"
@@ -223,101 +223,101 @@ node src/index.js raw select "1:234"
 node src/index.js raw export "1:234" --scale 2
 ```
 
-## Website Recreation
+## Recreacao de Websites
 
 ```bash
 node src/index.js recreate-url "https://example.com" --name "My Page"
-node src/index.js recreate-url "https://example.com" -w 375 -h 812  # Mobile
+node src/index.js recreate-url "https://example.com" -w 375 -h 812  # Telemovel
 node src/index.js analyze-url "https://example.com" --screenshot
 node src/index.js screenshot-url "https://example.com" --full
 ```
 
-## Images
+## Imagens
 
 ```bash
 node src/index.js create image "https://example.com/photo.png"
 node src/index.js screenshot-url "https://example.com"
-node src/index.js remove-bg                    # Remove background (needs API key)
+node src/index.js remove-bg                    # Remover fundo (necessita chave API)
 ```
 
 ## FigJam
 
 ```bash
-node src/index.js fj list                      # List pages
+node src/index.js fj list                      # Listar paginas
 node src/index.js fj sticky "Text" -x 100 -y 100 --color "#FEF08A"
 node src/index.js fj shape "Label" -x 200 -y 100 -w 200 -h 100
-node src/index.js fj connect "ID1" "ID2"       # Connect elements
-node src/index.js fj nodes                     # Show elements
+node src/index.js fj connect "ID1" "ID2"       # Ligar elementos
+node src/index.js fj nodes                     # Mostrar elementos
 node src/index.js fj delete "ID"
 node src/index.js fj eval "figma.currentPage.children.length"
 ```
 
-Shape types: `ROUNDED_RECTANGLE`, `RECTANGLE`, `ELLIPSE`, `DIAMOND`, `TRIANGLE_UP`, `TRIANGLE_DOWN`, `PARALLELOGRAM_RIGHT`, `PARALLELOGRAM_LEFT`
+Tipos de forma: `ROUNDED_RECTANGLE`, `RECTANGLE`, `ELLIPSE`, `DIAMOND`, `TRIANGLE_UP`, `TRIANGLE_DOWN`, `PARALLELOGRAM_RIGHT`, `PARALLELOGRAM_LEFT`
 
-## Daemon & Connection
-
-```bash
-node src/index.js connect                  # Connect (Yolo Mode)
-node src/index.js connect --safe           # Connect (Safe Mode, plugin)
-node src/index.js daemon status            # Check daemon status
-node src/index.js daemon status --debug    # Detailed token & connection info
-node src/index.js daemon diagnose          # Full diagnostic (troubleshooting)
-node src/index.js daemon start             # Start daemon manually
-node src/index.js daemon start --force     # Force restart
-node src/index.js daemon restart           # Restart with fresh token
-node src/index.js daemon stop              # Stop daemon
-node src/index.js daemon reconnect         # Reconnect to Figma
-node src/index.js files                    # List open Figma files (JSON)
-```
-
-### Troubleshooting Auth Errors
-
-If you see "Unauthorized: Invalid or missing token":
+## Daemon e Conexao
 
 ```bash
-node src/index.js daemon diagnose          # See what's wrong
-node src/index.js daemon restart           # Usually fixes it
+node src/index.js connect                  # Ligar (Modo Yolo)
+node src/index.js connect --safe           # Ligar (Modo Seguro, plugin)
+node src/index.js daemon status            # Verificar estado do daemon
+node src/index.js daemon status --debug    # Informacao detalhada de token e conexao
+node src/index.js daemon diagnose          # Diagnostico completo (resolucao de problemas)
+node src/index.js daemon start             # Iniciar daemon manualmente
+node src/index.js daemon start --force     # Forcar reinicio
+node src/index.js daemon restart           # Reiniciar com token novo
+node src/index.js daemon stop              # Parar daemon
+node src/index.js daemon reconnect         # Reconectar ao Figma
+node src/index.js files                    # Listar ficheiros Figma abertos (JSON)
 ```
 
-Token file location: `~/.figma-ds-cli/.daemon-token`
+### Resolucao de Erros de Autenticacao
 
-## Component Combinations (combos)
-
-Generate all variant combinations as individual components:
+Se vires "Unauthorized: Invalid or missing token":
 
 ```bash
-node src/index.js combos                   # Use selection
-node src/index.js combos "1:234"           # By node ID
-node src/index.js combos --dry-run         # Preview without creating
-node src/index.js combos --gap 60          # Custom gap between components
-node src/index.js combos --no-boolean      # Exclude boolean properties
+node src/index.js daemon diagnose          # Ver qual e o problema
+node src/index.js daemon restart           # Normalmente resolve
 ```
 
-**How it works:**
-1. Select a component set (or any variant/instance)
-2. Run `combos` to generate all combinations
-3. Creates **individual components** directly on canvas (no container frame)
-4. Each component named: `Button/Small/Default`, `Button/Small/Hover`, etc.
-5. Arranged in a grid (last property = columns, rest = rows)
-6. Row/column labels added automatically (use `--no-labels` to skip)
+Localizacao do ficheiro de token: `~/.figma-ds-cli/.daemon-token`
 
-## Size Variants (sizes)
+## Combinacoes de Componentes (combos)
 
-Generate Small/Medium/Large variants from a single component:
+Gerar todas as combinacoes de variantes como componentes individuais:
 
 ```bash
-node src/index.js sizes                       # Use selection
-node src/index.js sizes "1:234"               # By node ID
-node src/index.js sizes --base small          # Source is Small size
-node src/index.js sizes --base large          # Source is Large size
-node src/index.js sizes --gap 60              # Custom gap
+node src/index.js combos                   # Usar selecao
+node src/index.js combos "1:234"           # Por ID do no
+node src/index.js combos --dry-run         # Pre-visualizar sem criar
+node src/index.js combos --gap 60          # Espacamento personalizado entre componentes
+node src/index.js combos --no-boolean      # Excluir propriedades booleanas
 ```
 
-**How it works:**
-1. Select a component or frame
-2. Run `sizes --base <size>` to specify which size it is
-3. Creates Small, Medium, Large variants with proportional scaling
-4. Scales: dimensions, font sizes, padding, corner radius, gaps
+**Como funciona:**
+1. Seleciona um conjunto de componentes (ou qualquer variante/instancia)
+2. Executa `combos` para gerar todas as combinacoes
+3. Cria **componentes individuais** diretamente no canvas (sem frame contentor)
+4. Cada componente nomeado: `Button/Small/Default`, `Button/Small/Hover`, etc.
+5. Organizados numa grelha (ultima propriedade = colunas, restantes = linhas)
+6. Etiquetas de linha/coluna adicionadas automaticamente (usa `--no-labels` para omitir)
+
+## Variantes de Tamanho (sizes)
+
+Gerar variantes Small/Medium/Large a partir de um unico componente:
+
+```bash
+node src/index.js sizes                       # Usar selecao
+node src/index.js sizes "1:234"               # Por ID do no
+node src/index.js sizes --base small          # Origem e tamanho Small
+node src/index.js sizes --base large          # Origem e tamanho Large
+node src/index.js sizes --gap 60              # Espacamento personalizado
+```
+
+**Como funciona:**
+1. Seleciona um componente ou frame
+2. Executa `sizes --base <size>` para especificar qual o tamanho de origem
+3. Cria variantes Small, Medium, Large com escala proporcional
+4. Escala: dimensoes, tamanhos de fonte, padding, raio dos cantos, espacamentos
 
 ## JavaScript Eval
 
@@ -327,25 +327,25 @@ node src/index.js eval --file /tmp/script.js
 node src/index.js run /tmp/script.js
 ```
 
-## Render JSX Syntax
+## Sintaxe JSX do Render
 
-**Elements:** `<Frame>`, `<Rectangle>`, `<Ellipse>`, `<Text>`, `<Line>`, `<Image>`, `<SVG>`, `<Icon>`
+**Elementos:** `<Frame>`, `<Rectangle>`, `<Ellipse>`, `<Text>`, `<Line>`, `<Image>`, `<SVG>`, `<Icon>`
 
-**Size:** `w={320} h={200}`, `w="fill"`, `minW={100} maxW={500}`
+**Tamanho:** `w={320} h={200}`, `w="fill"`, `minW={100} maxW={500}`
 
 **Layout:** `flex="row|col"`, `gap={16}`, `wrap={true}`, `justify="start|center|end|between"`, `items="start|center|end"`
 
 **Padding:** `p={24}`, `px={16} py={8}`, `pt={8} pr={16} pb={8} pl={16}`
 
-**Appearance:** `bg="#fff"`, `stroke="#000"`, `strokeWidth={1}`, `opacity={0.5}`
+**Aparencia:** `bg="#fff"`, `stroke="#000"`, `strokeWidth={1}`, `opacity={0.5}`
 
-**Corners:** `rounded={16}`, `roundedTL={8}`, `overflow="hidden"`
+**Cantos:** `rounded={16}`, `roundedTL={8}`, `overflow="hidden"`
 
-**Effects:** `shadow="0 4 12 #0001"`, `blur={10}`, `rotate={45}`
+**Efeitos:** `shadow="0 4 12 #0001"`, `blur={10}`, `rotate={45}`
 
-**Text:** `<Text size={18} weight="bold" color="#000" font="Inter">Hello</Text>`
+**Texto:** `<Text size={18} weight="bold" color="#000" font="Inter">Hello</Text>`
 
-**WRONG vs RIGHT:**
+**ERRADO vs CORRETO:**
 ```
 layout="horizontal"  →  flex="row"
 padding={24}         →  p={24}
@@ -353,9 +353,9 @@ fill="#fff"          →  bg="#fff"
 cornerRadius={12}    →  rounded={12}
 ```
 
-## Advanced Examples
+## Exemplos Avancados
 
-### Switch to Dark Mode
+### Mudar para Modo Escuro
 ```javascript
 node src/index.js eval "
 const node = figma.getNodeById('1:234');
@@ -388,11 +388,11 @@ if (found) {
 "
 ```
 
-### Create Component Instance
+### Criar Instancia de Componente
 ```javascript
 node src/index.js eval "(function() {
   const comp = figma.currentPage.findOne(n => n.type === 'COMPONENT' && n.name === 'Button');
-  if (!comp) return 'Component not found';
+  if (!comp) return 'Componente nao encontrado';
   const instance = comp.createInstance();
   instance.x = 100;
   instance.y = 100;
@@ -400,7 +400,7 @@ node src/index.js eval "(function() {
 })()"
 ```
 
-### Smart Positioning
+### Posicionamento Inteligente
 ```javascript
 let smartX = 0;
 figma.currentPage.children.forEach(n => { smartX = Math.max(smartX, n.x + n.width); });
@@ -409,64 +409,64 @@ const frame = figma.createFrame();
 frame.x = smartX;
 ```
 
-## Safe Mode
+## Modo Seguro
 
-Safe Mode uses a plugin-based connection instead of CDP (Chrome DevTools Protocol). Use it when:
-- Company MacBook with restricted privacy settings
-- Full Disk Access permission not available
-- Prefer no Figma modification
+O Modo Seguro usa uma conexao baseada em plugin em vez de CDP (Chrome DevTools Protocol). Usa-o quando:
+- MacBook da empresa com definicoes de privacidade restritas
+- Permissao Full Disk Access nao disponivel
+- Preferencia por nao modificar o Figma
 
-### Connection
+### Conexao
 ```bash
 node src/index.js connect --safe
 ```
 
-Then in Figma: Plugins → Development → FigCli
+Depois no Figma: Plugins → Development → FigCli
 
-### Differences from Yolo Mode
+### Diferencas em Relacao ao Modo Yolo
 
-| Feature | Yolo Mode | Safe Mode |
-|---------|-----------|-----------|
-| Connection | Direct CDP | Plugin bridge |
-| Setup | Patches Figma once | Start plugin each session |
-| Speed | ~10x faster | Standard |
-| Timeout | 60 seconds | 60 seconds |
+| Funcionalidade | Modo Yolo | Modo Seguro |
+|----------------|-----------|-------------|
+| Conexao | CDP direto | Bridge via plugin |
+| Configuracao | Modifica o Figma uma vez | Iniciar plugin em cada sessao |
+| Velocidade | ~10x mais rapido | Normal |
+| Timeout | 60 segundos | 60 segundos |
 
-### Command Support
+### Suporte de Comandos
 
-All commands work in both modes. In Safe Mode, commands use native Figma API instead of figma-use:
+Todos os comandos funcionam em ambos os modos. No Modo Seguro, os comandos usam a API nativa do Figma em vez de figma-use:
 
-| Command | Yolo Mode | Safe Mode |
-|---------|-----------|-----------|
-| `render` | figma-use | daemon (native API) |
-| `render-batch` | figma-use | daemon (native API) |
-| `node to-component` | figma-use | native API |
-| `node delete` | figma-use | native API |
-| `node tree` | figma-use | native API |
-| `node bindings` | figma-use | native API |
-| `lint` | figma-use | native API |
-| `analyze colors/typography/spacing/clusters` | figma-use | native API |
-| `export-jsx` | figma-use | native API |
-| `export-storybook` | figma-use | native API |
-| All other commands | daemon | daemon |
+| Comando | Modo Yolo | Modo Seguro |
+|---------|-----------|-------------|
+| `render` | figma-use | daemon (API nativa) |
+| `render-batch` | figma-use | daemon (API nativa) |
+| `node to-component` | figma-use | API nativa |
+| `node delete` | figma-use | API nativa |
+| `node tree` | figma-use | API nativa |
+| `node bindings` | figma-use | API nativa |
+| `lint` | figma-use | API nativa |
+| `analyze colors/typography/spacing/clusters` | figma-use | API nativa |
+| `export-jsx` | figma-use | API nativa |
+| `export-storybook` | figma-use | API nativa |
+| Todos os outros comandos | daemon | daemon |
 
-### Tips for Safe Mode
+### Dicas para o Modo Seguro
 
-1. **Keep payloads smaller**: Break complex screens into multiple `render` calls
-2. **All commands work**: Native implementations match figma-use functionality
-3. **Timeout**: Both modes now have 60s timeout
+1. **Manter payloads mais pequenos**: Dividir ecras complexos em multiplas chamadas `render`
+2. **Todos os comandos funcionam**: As implementacoes nativas correspondem a funcionalidade do figma-use
+3. **Timeout**: Ambos os modos tem agora 60s de timeout
 
-### When render-batch fails
+### Quando o render-batch falha
 
-If `render-batch` times out with complex JSX, break it up:
+Se o `render-batch` exceder o timeout com JSX complexo, divide-o:
 
 ```bash
-# Instead of one large batch
-node src/index.js render-batch '[huge array]'
+# Em vez de um batch grande
+node src/index.js render-batch '[array enorme]'
 
-# Use multiple smaller batches
+# Usa multiplos batches mais pequenos
 node src/index.js render '<Frame>...</Frame>'
 node src/index.js render '<Frame>...</Frame>'
 ```
 
-Or use `eval` with native Figma API for maximum control (see "Complex Components" in CLAUDE.md).
+Ou usa `eval` com a API nativa do Figma para maximo controlo (ve "Complex Components" no CLAUDE.md).
