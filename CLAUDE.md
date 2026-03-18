@@ -1,6 +1,6 @@
-# figma-ds-cli
+# claudio-cli
 
-CLI that controls Figma Desktop directly. No API key needed.
+CLI que controla o Figma Desktop diretamente. Não precisa de API key.
 
 ---
 
@@ -67,71 +67,71 @@ CLI that controls Figma Desktop directly. No API key needed.
 
 ---
 
-## Quick Reference
+## Referência Rápida
 
-| User says | Command |
+| O utilizador diz | Comando |
 |-----------|---------|
-| "connect to figma" | `node src/index.js connect` |
-| "add shadcn colors" | `node src/index.js tokens preset shadcn` |
-| "add tailwind colors" | `node src/index.js tokens tailwind` |
-| "show colors on canvas" | `node src/index.js var visualize` |
-| "create dashboard" | `node src/index.js blocks create dashboard-01` |
-| "list blocks" | `node src/index.js blocks list` |
-| "create cards/buttons" | `render-batch` + `node to-component` |
-| "create a rectangle/frame" | `node src/index.js render '<Frame>...'` |
-| "convert to component" | `node src/index.js node to-component "ID"` |
-| "list variables" | `node src/index.js var list` |
-| "find nodes named X" | `node src/index.js find "X"` |
-| "what's on canvas" | `node src/index.js canvas info` |
-| "export as PNG/SVG" | `node src/index.js export png` |
-| "show all variants" | `node src/index.js combos` |
-| "create size variants" | `node src/index.js sizes --base small` |
-| "create a slot" | `node src/index.js slot create "Name"` |
-| "list slots" | `node src/index.js slot list` |
-| "reset slot" | `node src/index.js slot reset` |
-| "verify creation" | `node src/index.js verify` |
+| "liga ao figma" | `node src/index.js connect` |
+| "adiciona cores shadcn" | `node src/index.js tokens preset shadcn` |
+| "adiciona cores tailwind" | `node src/index.js tokens tailwind` |
+| "mostra as cores no canvas" | `node src/index.js var visualize` |
+| "cria um dashboard" | `node src/index.js blocks create dashboard-01` |
+| "lista os blocos" | `node src/index.js blocks list` |
+| "cria cards/botões" | `render-batch` + `node to-component` |
+| "cria um retângulo/frame" | `node src/index.js render '<Frame>...'` |
+| "converte em componente" | `node src/index.js node to-component "ID"` |
+| "lista as variáveis" | `node src/index.js var list` |
+| "encontra nós com o nome X" | `node src/index.js find "X"` |
+| "o que está no canvas" | `node src/index.js canvas info` |
+| "exporta como PNG/SVG" | `node src/index.js export png` |
+| "mostra todas as variantes" | `node src/index.js combos` |
+| "cria variantes de tamanho" | `node src/index.js sizes --base small` |
+| "cria um slot" | `node src/index.js slot create "Name"` |
+| "lista os slots" | `node src/index.js slot list` |
+| "reinicia o slot" | `node src/index.js slot reset` |
+| "verifica a criação" | `node src/index.js verify` |
 
-**Full command reference:** See REFERENCE.md
+**Referência completa de comandos:** Ver REFERENCE.md
 
 ---
 
-## AI Verification (Internal)
+## Verificação por IA (Interno)
 
-After creating any component, run `verify` to get a small screenshot for validation:
+Após criar qualquer componente, executa `verify` para obter um screenshot pequeno para validação:
 
 ```bash
-node src/index.js verify              # Screenshot of selection
-node src/index.js verify "123:456"    # Screenshot of specific node
+node src/index.js verify              # Screenshot da seleção
+node src/index.js verify "123:456"    # Screenshot de um nó específico
 ```
 
-Returns JSON with base64 image (max 2000px, auto-scaled to stay under API limits).
+Devolve JSON com imagem base64 (máx. 2000px, redimensionado automaticamente para ficar dentro dos limites da API).
 
-**Always verify after:**
-- `render` or `render-batch`
+**Verificar sempre após:**
+- `render` ou `render-batch`
 - `node to-component`
-- Any visual creation
+- Qualquer criação visual
 
-This is for internal AI checks, not shown to users.
+Isto é para verificações internas da IA, não é mostrado aos utilizadores.
 
 ---
 
-## Blocks (Pre-built UI Layouts)
+## Blocos (Layouts Pré-construídos)
 
-**ALWAYS use `blocks create` for dashboards and page layouts.** Never build them manually with render/eval.
+**Usa SEMPRE `blocks create` para dashboards e layouts de página.** Nunca os construas manualmente com render/eval.
 
 ```bash
-node src/index.js blocks list                    # Show available blocks
-node src/index.js blocks create dashboard-01     # Create dashboard in Figma
+node src/index.js blocks list                    # Mostra blocos disponíveis
+node src/index.js blocks create dashboard-01     # Cria dashboard no Figma
 ```
 
-**dashboard-01**: Full analytics dashboard with:
-- Sidebar with real Lucide icons (layout-dashboard, refresh-cw, bar-chart-3, folder, users, etc.)
-- Stats cards (Revenue, Customers, Accounts, Growth)
-- Area chart with two datasets
-- Data table with pagination
-- All colors bound to shadcn variables (supports Light/Dark mode)
+**dashboard-01**: Dashboard de analítica completo com:
+- Barra lateral com ícones Lucide reais (layout-dashboard, refresh-cw, bar-chart-3, folder, users, etc.)
+- Cards de estatísticas (Revenue, Customers, Accounts, Growth)
+- Gráfico de área com dois conjuntos de dados
+- Tabela de dados com paginação
+- Todas as cores ligadas a variáveis shadcn (suporta modo Light/Dark)
 
-**Dark mode copy**: After creating, clone and switch mode:
+**Cópia em modo escuro**: Após criar, clona e muda o modo:
 ```javascript
 // Via eval:
 var clone = dashboard.clone();
@@ -139,46 +139,46 @@ clone.name = 'Dashboard (Dark)';
 clone.setExplicitVariableModeForCollection(semanticCollection, darkModeId);
 ```
 
-Block source files: `src/blocks/`
+Ficheiros fonte dos blocos: `src/blocks/`
 
 ---
 
-## Design Tokens
+## Tokens de Design
 
-"Add shadcn colors":
+"Adicionar cores shadcn":
 ```bash
 node src/index.js tokens preset shadcn   # 244 primitives + 32 semantic (Light/Dark)
 ```
 
-"Add tailwind colors":
+"Adicionar cores tailwind":
 ```bash
-node src/index.js tokens tailwind        # 242 primitive colors only
+node src/index.js tokens tailwind        # 242 cores primitivas apenas
 ```
 
-"Create design system":
+"Criar sistema de design":
 ```bash
-node src/index.js tokens ds              # IDS Base colors
+node src/index.js tokens ds              # Cores base IDS
 ```
 
 **shadcn vs tailwind:**
-- `tokens preset shadcn` = Full shadcn system (primitives + semantic tokens with Light/Dark mode)
-- `tokens tailwind` = Just the Tailwind color palette (primitives only)
+- `tokens preset shadcn` = Sistema shadcn completo (primitives + tokens semânticos com modo Light/Dark)
+- `tokens tailwind` = Apenas a paleta de cores Tailwind (apenas primitives)
 
-"Delete all variables":
+"Eliminar todas as variáveis":
 ```bash
-node src/index.js var delete-all                    # All collections
-node src/index.js var delete-all -c "primitives"    # Only specific collection
+node src/index.js var delete-all                    # Todas as coleções
+node src/index.js var delete-all -c "primitives"    # Apenas coleção específica
 ```
 
-**Note:** `var list` only SHOWS existing variables. Use `tokens` commands to CREATE them.
+**Nota:** `var list` apenas MOSTRA variáveis existentes. Usa os comandos `tokens` para as CRIAR.
 
 ---
 
-## Fast Variable Binding (var: syntax)
+## Ligação Rápida de Variáveis (sintaxe var:)
 
-Use `var:name` syntax to bind variables directly at creation time (currently searches shadcn collections):
+Usa a sintaxe `var:name` para ligar variáveis diretamente no momento da criação (atualmente pesquisa nas coleções shadcn):
 
-### Create Commands with var:
+### Comandos de criação com var:
 ```bash
 node src/index.js create rect "Card" --fill "var:card" --stroke "var:border"
 node src/index.js create circle "Avatar" --fill "var:primary"
@@ -189,131 +189,131 @@ node src/index.js create autolayout "Container" --fill "var:muted"
 node src/index.js create icon lucide:star -c "var:primary"
 ```
 
-### JSX render with var:
+### render JSX com var:
 ```bash
 node src/index.js render '<Frame bg="var:card" stroke="var:border" rounded={12} p={24}>
   <Text color="var:foreground" size={18}>Title</Text>
 </Frame>'
 ```
 
-### Set commands with var:
+### Comandos set com var:
 ```bash
 node src/index.js set fill "var:primary"
 node src/index.js set stroke "var:border"
 ```
 
-**Variables:** `background`, `foreground`, `card`, `primary`, `secondary`, `muted`, `accent`, `border`, and their `-foreground` variants.
+**Variáveis:** `background`, `foreground`, `card`, `primary`, `secondary`, `muted`, `accent`, `border`, e as respetivas variantes `-foreground`.
 
 ---
 
-## Connection Modes
+## Modos de Conexão
 
-### Yolo Mode (Recommended)
-Patches Figma once, then connects directly. Fully automatic.
+### Modo Yolo (Recomendado)
+Faz patch ao Figma uma vez, depois liga diretamente. Totalmente automático.
 ```bash
 node src/index.js connect
 ```
 
-### Safe Mode
-Uses plugin, no Figma modification. Start plugin each session.
+### Modo Safe
+Usa plugin, sem modificação do Figma. Inicia o plugin em cada sessão.
 ```bash
 node src/index.js connect --safe
 ```
-Then: Plugins → Development → FigCli
+Depois: Plugins → Development → FigCli
 
-**Safe Mode Notes:**
-- All commands work via daemon (no figma-use dependency)
-- 60s timeout (same as Yolo Mode)
-- **CRITICAL: `render-batch` does NOT render text properly in Safe Mode!**
-- Use `eval` with direct Figma API for components with text
+**Notas do Modo Safe:**
+- Todos os comandos funcionam via daemon (sem dependência do figma-use)
+- Timeout de 60s (igual ao Modo Yolo)
+- **CRÍTICO: `render-batch` NÃO renderiza texto corretamente no Modo Safe!**
+- Usa `eval` com a API direta do Figma para componentes com texto
 
 ---
 
-## Creating Components (Safe Mode)
+## Criar Componentes (Modo Safe)
 
-**DO NOT use render-batch for components with text in Safe Mode.** Use `eval` with native Figma API:
+**NÃO uses render-batch para componentes com texto no Modo Safe.** Usa `eval` com a API nativa do Figma:
 
 ```javascript
 node src/index.js eval "(async () => {
-  // 1. Load fonts FIRST
+  // 1. Carregar fontes PRIMEIRO
   await figma.loadFontAsync({ family: 'Inter', style: 'Bold' });
   await figma.loadFontAsync({ family: 'Inter', style: 'Regular' });
 
-  // 2. Create frame with FIXED width
+  // 2. Criar frame com largura FIXA
   const card = figma.createFrame();
   card.name = 'Card';
   card.x = 100; card.y = 100;
-  card.resize(340, 1); // Fixed width!
+  card.resize(340, 1); // Largura fixa!
   card.layoutMode = 'HORIZONTAL';
-  card.primaryAxisSizingMode = 'FIXED'; // Keep width fixed
-  card.counterAxisSizingMode = 'AUTO';  // Height hugs content
+  card.primaryAxisSizingMode = 'FIXED'; // Manter largura fixa
+  card.counterAxisSizingMode = 'AUTO';  // Altura ajusta ao conteúdo
   card.paddingTop = card.paddingBottom = card.paddingLeft = card.paddingRight = 20;
   card.itemSpacing = 16;
   card.cornerRadius = 12;
   card.fills = [{ type: 'SOLID', color: { r: 0.094, g: 0.094, b: 0.106 } }];
 
-  // 3. Content frame must FILL remaining space
+  // 3. Frame de conteúdo deve PREENCHER o espaço restante
   const content = figma.createFrame();
   content.fills = [];
   content.layoutMode = 'VERTICAL';
   content.itemSpacing = 4;
   card.appendChild(content);
-  content.layoutSizingHorizontal = 'FILL'; // Critical!
+  content.layoutSizingHorizontal = 'FILL'; // Crítico!
 
-  // 4. Text must FILL to wrap
+  // 4. Texto deve PREENCHER para quebrar linha
   const title = figma.createText();
   title.fontName = { family: 'Inter', style: 'Bold' };
   title.characters = 'Title here';
   title.fontSize = 14;
   title.fills = [{ type: 'SOLID', color: { r: 1, g: 1, b: 1 } }];
   content.appendChild(title);
-  title.layoutSizingHorizontal = 'FILL'; // Critical!
+  title.layoutSizingHorizontal = 'FILL'; // Crítico!
 
-  // 5. Convert to component
+  // 5. Converter em componente
   const comp = figma.createComponentFromNode(card);
   return { id: comp.id, name: comp.name };
 })()"
 ```
 
-**Auto-Layout Rules (Text Cut-Off Prevention):**
-1. Parent frame needs `resize(WIDTH, 1)` + `primaryAxisSizingMode = 'FIXED'`
-2. Child content frames need `layoutSizingHorizontal = 'FILL'` AFTER appendChild
-3. ALL text nodes need `layoutSizingHorizontal = 'FILL'` AFTER appendChild
-4. Order matters: appendChild first, then set layoutSizingHorizontal
+**Regras de Auto-Layout (Prevenção de Texto Cortado):**
+1. O frame pai precisa de `resize(WIDTH, 1)` + `primaryAxisSizingMode = 'FIXED'`
+2. Os frames filhos de conteúdo precisam de `layoutSizingHorizontal = 'FILL'` APÓS appendChild
+3. TODOS os nós de texto precisam de `layoutSizingHorizontal = 'FILL'` APÓS appendChild
+4. A ordem importa: appendChild primeiro, depois definir layoutSizingHorizontal
 
-**Before Creating - Check Positions:**
+**Antes de Criar - Verificar Posições:**
 ```javascript
-// Check what's on page to avoid overlap
+// Verificar o que está na página para evitar sobreposição
 const nodes = figma.currentPage.children.map(n => ({
   name: n.name,
   x: n.x,
   width: n.width
 }));
-// Find rightmost edge, place new components after it
+// Encontrar a extremidade mais à direita, colocar novos componentes depois
 const maxX = Math.max(0, ...nodes.map(n => n.x + n.width)) + 100;
 ```
 
-**NEVER delete existing nodes** - users may have components they want to keep!
+**NUNCA elimines nós existentes** - os utilizadores podem ter componentes que querem manter!
 
-**After Creating - Always Verify:**
+**Após Criar - Verificar Sempre:**
 ```bash
-node src/index.js verify "NODE_ID"  # Take screenshot and check visually
+node src/index.js verify "NODE_ID"  # Tirar screenshot e verificar visualmente
 ```
 
 ---
 
-## Complex Components (Pricing Cards, etc.)
+## Componentes Complexos (Pricing Cards, etc.)
 
-For complex multi-element components, use a **single eval** with native Figma API instead of JSX:
+Para componentes complexos com múltiplos elementos, usa um **único eval** com a API nativa do Figma em vez de JSX:
 
-### Pattern
-1. **Check for variables first** - don't assume any collection exists
-2. **Use fallback colors** when no variables present
-3. **Single eval** - create everything in one API call
-4. **Data-driven** - define content in array, loop to create
-5. **Equal height** - use `layoutAlign: "STRETCH"` and `layoutGrow: 1`
+### Padrão
+1. **Verificar variáveis primeiro** - não assumir que alguma coleção existe
+2. **Usar cores de fallback** quando não existem variáveis
+3. **Único eval** - criar tudo numa única chamada à API
+4. **Orientado a dados** - definir conteúdo em array, iterar para criar
+5. **Altura igual** - usar `layoutAlign: "STRETCH"` e `layoutGrow: 1`
 
-### Fallback Colors (Dark Theme)
+### Cores de Fallback (Tema Escuro)
 ```javascript
 const colors = {
   bg: { r: 0.09, g: 0.09, b: 0.11 },       // #17171c
@@ -326,26 +326,26 @@ const colors = {
 };
 ```
 
-### Variable Detection
+### Deteção de Variáveis
 ```javascript
-// Check for ANY variables, not just shadcn
+// Verificar QUAISQUER variáveis, não apenas shadcn
 const collections = await figma.variables.getLocalVariableCollectionsAsync();
 if (collections.length > 0) {
-  // Ask user which collection to use
+  // Perguntar ao utilizador qual coleção usar
 } else {
-  // Use fallback colors
+  // Usar cores de fallback
 }
 ```
 
-### Equal Height Cards
+### Cards com Altura Igual
 ```javascript
-// After creating cards in container:
+// Após criar cards no contentor:
 for (const card of container.children) {
-  card.layoutAlign = 'STRETCH';           // Fill container height
-  card.primaryAxisSizingMode = 'FIXED';   // Keep fixed width
+  card.layoutAlign = 'STRETCH';           // Preencher altura do contentor
+  card.primaryAxisSizingMode = 'FIXED';   // Manter largura fixa
   for (const child of card.children) {
     if (child.name === 'Features') {
-      child.layoutGrow = 1;               // Features section grows
+      child.layoutGrow = 1;               // Secção de features cresce
     }
   }
 }
@@ -353,9 +353,9 @@ for (const card of container.children) {
 
 ---
 
-## Creating Webpages
+## Criar Páginas Web
 
-Create ONE parent frame with vertical auto-layout containing all sections:
+Cria UM frame pai com auto-layout vertical contendo todas as secções:
 
 ```bash
 node src/index.js render '<Frame name="Landing Page" w={1440} flex="col" bg="#0a0a0f">
@@ -373,37 +373,37 @@ node src/index.js render '<Frame name="Landing Page" w={1440} flex="col" bg="#0a
 
 ## Slots
 
-Figma's native slots feature allows flexible content areas in components. Slots let designers add, remove, and reorder content in instances without detaching.
+A funcionalidade nativa de slots do Figma permite áreas de conteúdo flexíveis em componentes. Os slots permitem que os designers adicionem, removam e reordenem conteúdo em instâncias sem fazer detach.
 
-### Slot Commands
+### Comandos de Slots
 
 ```bash
-# Create slot on selected component
+# Criar slot no componente selecionado
 node src/index.js slot create "Content" --flex col --gap 8 --padding 16
 
-# List slots in component
+# Listar slots no componente
 node src/index.js slot list
 node src/index.js slot list "component-id"
 
-# Set preferred components for a slot
+# Definir componentes preferidos para um slot
 node src/index.js slot preferred "Slot#1:2" "component-id-1" "component-id-2"
 
-# Reset slot in instance to defaults
+# Reiniciar slot na instância para os valores padrão
 node src/index.js slot reset
 node src/index.js slot reset "slot-node-id"
 
-# Convert frame to slot (must be inside component)
+# Converter frame em slot (tem de estar dentro de um componente)
 node src/index.js slot convert --name "Actions"
 
-# Add content to slot in instance
+# Adicionar conteúdo ao slot numa instância
 node src/index.js slot add "slot-id" --component "component-id"
 node src/index.js slot add "slot-id" --frame
 node src/index.js slot add "slot-id" --text "Hello"
 ```
 
-### JSX Slot Syntax
+### Sintaxe JSX para Slots
 
-Use `<Slot>` in JSX to create slots. When parent is a component, creates real SLOT. Otherwise falls back to frame.
+Usa `<Slot>` em JSX para criar slots. Quando o pai é um componente, cria um SLOT real. Caso contrário, recorre a um frame.
 
 ```jsx
 <Frame name="Card" w={300} h={200} bg="#18181b" rounded={12} flex="col" p={16} gap={12}>
@@ -414,115 +414,115 @@ Use `<Slot>` in JSX to create slots. When parent is a component, creates real SL
 </Frame>
 ```
 
-**Slot props:**
-- `name` - Slot name (shown in properties panel)
-- `flex` - Layout direction: "row" or "col"
-- `gap` - Spacing between items
+**Propriedades do Slot:**
+- `name` - Nome do slot (mostrado no painel de propriedades)
+- `flex` - Direção do layout: "row" ou "col"
+- `gap` - Espaçamento entre itens
 - `p`, `px`, `py` - Padding
-- `w`, `h` - Size ("fill" or fixed)
-- `bg` - Background fill
+- `w`, `h` - Tamanho ("fill" ou fixo)
+- `bg` - Preenchimento de fundo
 
-**Self-closing slot (empty):**
+**Slot auto-fechado (vazio):**
 ```jsx
 <Slot name="Actions" flex="row" gap={8} />
 ```
 
-### Slot Workflow
+### Fluxo de Trabalho com Slots
 
-1. **Create component with slot:**
+1. **Criar componente com slot:**
 ```bash
-# Render component structure
+# Renderizar estrutura do componente
 node src/index.js render '<Frame name="Card" ...>
   <Slot name="Content" flex="col" w="fill" />
 </Frame>'
 
-# Convert to component
+# Converter em componente
 node src/index.js node to-component "frame-id"
 ```
 
-2. **Or add slot to existing component:**
+2. **Ou adicionar slot a componente existente:**
 ```bash
-# Select component, then:
+# Selecionar componente, depois:
 node src/index.js slot create "Content" --flex col --gap 8
 ```
 
-3. **Set preferred components:**
+3. **Definir componentes preferidos:**
 ```bash
 node src/index.js slot preferred "Slot#1:2" "button-comp-id" "icon-comp-id"
 ```
 
-**CRITICAL: `isSlot = true` does NOT work in eval!**
-Setting `frame.isSlot = true` directly in Figma API code will NOT create a slot. You MUST use:
+**CRÍTICO: `isSlot = true` NÃO funciona em eval!**
+Definir `frame.isSlot = true` diretamente no código da API do Figma NÃO cria um slot. TENS de usar:
 ```bash
 node src/index.js slot convert "frame-id" --name "SlotName"
 ```
 
-4. **In instances, slots allow:**
-- Adding any content (or only preferred if set)
-- Reordering children
-- Removing children
-- Reset to defaults with `slot reset`
+4. **Nas instâncias, os slots permitem:**
+- Adicionar qualquer conteúdo (ou apenas os preferidos, se definidos)
+- Reordenar filhos
+- Remover filhos
+- Reiniciar para os valores padrão com `slot reset`
 
 ---
 
-## JSX Syntax (render command)
+## Sintaxe JSX (comando render)
 
 ```jsx
 // Layout
-flex="row"              // or "col"
-gap={16}                // spacing between items
-p={24}                  // padding all sides
+flex="row"              // ou "col"
+gap={16}                // espaçamento entre itens
+p={24}                  // padding em todos os lados
 px={16} py={8}          // padding x/y
-pt={8} pr={16} pb={8} pl={16}  // individual padding
+pt={8} pr={16} pb={8} pl={16}  // padding individual
 
-// Alignment
-justify="center"        // main axis: start, center, end, between
-items="center"          // cross axis: start, center, end
+// Alinhamento
+justify="center"        // eixo principal: start, center, end, between
+items="center"          // eixo transversal: start, center, end
 
-// Size
-w={320} h={200}         // fixed size
-w="fill" h="fill"       // fill parent
-minW={100} maxW={500}   // constraints
+// Tamanho
+w={320} h={200}         // tamanho fixo
+w="fill" h="fill"       // preencher o pai
+minW={100} maxW={500}   // restrições
 minH={50} maxH={300}
 
-// Appearance
-bg="#fff"               // fill color
-bg="var:card"           // bind to variable (FAST, inline binding)
-stroke="#000"           // stroke color
-stroke="var:border"     // bind stroke to variable
-strokeWidth={2}         // stroke thickness
+// Aparência
+bg="#fff"               // cor de preenchimento
+bg="var:card"           // ligar a variável (RÁPIDO, ligação inline)
+stroke="#000"           // cor do traço
+stroke="var:border"     // ligar traço a variável
+strokeWidth={2}         // espessura do traço
 strokeAlign="inside"    // inside, outside, center
 opacity={0.8}           // 0..1
 blendMode="multiply"    // multiply, overlay, etc.
 
-// Corners
-rounded={16}            // all corners
+// Cantos
+rounded={16}            // todos os cantos
 roundedTL={8} roundedTR={8} roundedBL={0} roundedBR={0}  // individual
-cornerSmoothing={0.6}   // iOS squircle (0..1)
+cornerSmoothing={0.6}   // squircle iOS (0..1)
 
-// Effects
-shadow="4px 4px 12px rgba(0,0,0,0.25)"  // drop shadow
-blur={8}                // layer blur
-overflow="hidden"       // clip content
-rotate={45}             // rotation degrees
+// Efeitos
+shadow="4px 4px 12px rgba(0,0,0,0.25)"  // sombra projetada
+blur={8}                // desfoque de camada
+overflow="hidden"       // recortar conteúdo
+rotate={45}             // graus de rotação
 
-// Text
+// Texto
 <Text size={18} weight="bold" color="#000" font="Inter">Hello</Text>
 <Text color="var:foreground">Text with variable color</Text>
 
-// Icons (Lucide via Iconify API - real SVG nodes, not placeholders)
+// Ícones (Lucide via Iconify API - nós SVG reais, não placeholders)
 <Icon name="lucide:chevron-left" size={16} color="#fff" />
 <Icon name="lucide:check" size={14} color="var:primary-foreground" />
-// Any Lucide icon: lucide:plus, lucide:x, lucide:search, lucide:settings, etc.
-// Full list: https://lucide.dev/icons
+// Qualquer ícone Lucide: lucide:plus, lucide:x, lucide:search, lucide:settings, etc.
+// Lista completa: https://lucide.dev/icons
 ```
 
-### Fast Variable Binding (var: syntax)
+### Ligação Rápida de Variáveis (sintaxe var:)
 
-Use `var:name` syntax to bind variables directly at creation time (FAST, no separate bind commands needed):
+Usa a sintaxe `var:name` para ligar variáveis diretamente no momento da criação (RÁPIDO, sem necessidade de comandos bind separados):
 
 ```jsx
-// Frame with bound fill and stroke
+// Frame com preenchimento e traço ligados
 <Frame bg="var:card" stroke="var:border">
   <Text color="var:foreground">Bound text</Text>
   <Frame bg="var:primary">
@@ -531,44 +531,44 @@ Use `var:name` syntax to bind variables directly at creation time (FAST, no sepa
 </Frame>
 ```
 
-**Available shadcn variables:**
-- `background`, `foreground` (page background/text)
-- `card`, `card-foreground` (card backgrounds)
-- `primary`, `primary-foreground` (buttons, accents)
+**Variáveis shadcn disponíveis:**
+- `background`, `foreground` (fundo/texto da página)
+- `card`, `card-foreground` (fundos de cards)
+- `primary`, `primary-foreground` (botões, acentos)
 - `secondary`, `secondary-foreground`
-- `muted`, `muted-foreground` (subtle text)
+- `muted`, `muted-foreground` (texto subtil)
 - `accent`, `accent-foreground`
 - `border`, `input`, `ring`
 
-**Advantages over separate `bind` commands:**
-- Single render call binds all variables at once
-- No timeouts or multiple API calls
-- Works with complex nested structures
+**Vantagens sobre comandos `bind` separados:**
+- Uma única chamada render liga todas as variáveis de uma vez
+- Sem timeouts ou múltiplas chamadas à API
+- Funciona com estruturas aninhadas complexas
 
-**Also works with `set` commands:**
+**Também funciona com comandos `set`:**
 ```bash
-node src/index.js set fill "var:primary"    # Bind fill to existing element
-node src/index.js set stroke "var:border"   # Bind stroke to existing element
+node src/index.js set fill "var:primary"    # Ligar preenchimento a elemento existente
+node src/index.js set stroke "var:border"   # Ligar traço a elemento existente
 ```
 
 ### Auto-Layout
 
 ```jsx
-// Wrap: items flow to next row when full
+// Wrap: itens fluem para a próxima linha quando cheio
 wrap={true}             // layoutWrap = 'WRAP'
-rowGap={12}             // gap between rows (counterAxisSpacing)
+rowGap={12}             // espaçamento entre linhas (counterAxisSpacing)
 
-// Grow: expand to fill remaining space
+// Grow: expandir para preencher espaço restante
 grow={1}                // layoutGrow = 1
 
-// Stretch: fill cross-axis
+// Stretch: preencher eixo transversal
 stretch={true}          // layoutAlign = 'STRETCH'
 
-// Absolute: position freely within parent
-position="absolute" x={12} y={12}  // must have name for x/y to work
+// Absolute: posicionar livremente dentro do pai
+position="absolute" x={12} y={12}  // precisa de name para x/y funcionar
 ```
 
-**Complete example:**
+**Exemplo completo:**
 ```bash
 node src/index.js render '<Frame name="Card" w={300} flex="col" bg="#18181b" rounded={12} overflow="hidden">
   <Frame w="fill" h={100} bg="#333" />
@@ -585,23 +585,23 @@ node src/index.js render '<Frame name="Card" w={300} flex="col" bg="#18181b" rou
 </Frame>'
 ```
 
-**Common mistakes (silently ignored, no error!):**
+**Erros comuns (ignorados silenciosamente, sem erro!):**
 ```
-WRONG                    RIGHT
+ERRADO                   CORRETO
 layout="horizontal"   →  flex="row"
 padding={24}          →  p={24}
 fill="#fff"           →  bg="#fff"
 cornerRadius={12}     →  rounded={12}
 fontSize={18}         →  size={18}
 fontWeight="bold"     →  weight="bold"
-justify="between"     →  use grow={1} spacer instead
+justify="between"     →  usar grow={1} como espaçador
 ```
 
-### Layout Patterns
+### Padrões de Layout
 
-**Push items to edges (navbar pattern):**
+**Empurrar itens para as extremidades (padrão navbar):**
 ```jsx
-// justify="between" doesn't work reliably, use grow spacer instead
+// justify="between" não funciona de forma fiável, usar grow como espaçador
 <Frame flex="row" items="center">
   <Frame>Logo</Frame>
   <Frame grow={1} justify="center">Nav Links</Frame>
@@ -609,18 +609,18 @@ justify="between"     →  use grow={1} spacer instead
 </Frame>
 ```
 
-**Badge at avatar corner:**
+**Badge no canto do avatar:**
 ```jsx
-// Absolute x/y is relative to parent padding
-// Avatar at padding=24, size=100, badge=20
-// Position: padding + avatarSize - badgeSize/2 = 24 + 100 - 10 = 114
+// x/y absoluto é relativo ao padding do pai
+// Avatar com padding=24, tamanho=100, badge=20
+// Posição: padding + tamanhoAvatar - tamanhoBadge/2 = 24 + 100 - 10 = 114
 <Frame p={24}>
   <Frame w={100} h={100} rounded={50} />
   <Frame name="Badge" w={20} h={20} position="absolute" x={114} y={114} />
 </Frame>
 ```
 
-**Input at bottom (chat pattern):**
+**Input no fundo (padrão chat):**
 ```jsx
 <Frame flex="col" h={400}>
   <Frame>Message 1</Frame>
@@ -630,16 +630,16 @@ justify="between"     →  use grow={1} spacer instead
 </Frame>
 ```
 
-**Avoid content overflow:**
+**Evitar overflow de conteúdo:**
 ```jsx
-// BAD: fixed height too small for auto-sized children
+// MAU: altura fixa demasiado pequena para filhos com tamanho automático
 <Frame h={160} p={24}><Frame h={139} /></Frame>  // 139+48 > 160!
 
-// GOOD: ensure height fits content + padding
+// BOM: garantir que a altura cabe no conteúdo + padding
 <Frame h={200} p={24}><Frame h={139} /></Frame>  // 139+48 < 200 ✓
 ```
 
-**Complete card example:**
+**Exemplo completo de card:**
 ```bash
 node src/index.js render '<Frame name="Card" w={320} h={200} bg="#18181b" rounded={12} flex="col" p={24} gap={12}>
   <Text size={18} weight="bold" color="#fff">Title</Text>
@@ -650,34 +650,34 @@ node src/index.js render '<Frame name="Card" w={320} h={200} bg="#18181b" rounde
 </Frame>'
 ```
 
-### Common Pitfalls
+### Erros Comuns
 
-**1. Text gets cut off (CRITICAL):**
+**1. Texto cortado (CRÍTICO):**
 ```jsx
-// BAD: Text without w="fill" will be single line and clip
+// MAU: Texto sem w="fill" fica numa única linha e é cortado
 <Frame flex="col" gap={8}>
   <Text size={16} weight="semibold" color="#fff">Title cut off</Text>
   <Text size={14} color="#a1a1aa">Description also cut off...</Text>
 </Frame>
 
-// GOOD: Add w="fill" to parent Frame AND ALL Text elements
+// BOM: Adicionar w="fill" ao Frame pai E A TODOS os elementos Text
 <Frame flex="col" gap={8} w="fill">
   <Text size={16} weight="semibold" color="#fff" w="fill">Title wraps properly</Text>
   <Text size={14} color="#a1a1aa" w="fill">Description wraps properly.</Text>
 </Frame>
 ```
-**Rule:** For text to wrap, you need:
-1. Parent frame with `w="fill"` or fixed width
-2. **EVERY** Text element needs `w="fill"` (not just descriptions!)
-3. Parent must have `flex="col"` or `flex="row"`
+**Regra:** Para o texto quebrar linha, precisas de:
+1. Frame pai com `w="fill"` ou largura fixa
+2. **TODOS** os elementos Text precisam de `w="fill"` (não apenas descrições!)
+3. O pai tem de ter `flex="col"` ou `flex="row"`
 
-**IMPORTANT:** ALL text that could wrap needs `w="fill"`:
-- Titles (e.g., "Wireless Noise-Canceling Headphones")
-- Descriptions
+**IMPORTANTE:** TODO o texto que possa quebrar linha precisa de `w="fill"`:
+- Títulos (ex: "Wireless Noise-Canceling Headphones")
+- Descrições
 - Labels
-- Any multi-word text
+- Qualquer texto com várias palavras
 
-**Real example - card with title AND description:**
+**Exemplo real - card com título E descrição:**
 ```jsx
 <Frame name="Card" w={340} bg="#18181b" rounded={16} flex="col" p={20} gap={16}>
   <Frame flex="col" gap={8} w="fill">
@@ -687,75 +687,75 @@ node src/index.js render '<Frame name="Card" w={320} h={200} bg="#18181b" rounde
 </Frame>
 ```
 
-**2. Toggle switches - use flex, not absolute:**
+**2. Toggle switches - usar flex, não absolute:**
 ```jsx
-// BAD: Absolute positioning for knob
+// MAU: Posicionamento absoluto para o botão
 <Frame w={52} h={28} bg="#3b82f6" rounded={14} p={2}>
   <Frame w={24} h={24} bg="#fff" rounded={12} position="absolute" x={26} y={2} />
 </Frame>
 
-// GOOD: Flex with justify for ON/OFF state
-// ON state (knob right)
+// BOM: Flex com justify para estado ON/OFF
+// Estado ON (botão à direita)
 <Frame w={52} h={28} bg="#3b82f6" rounded={14} flex="row" items="center" p={2} justify="end">
   <Frame w={24} h={24} bg="#fff" rounded={12} />
 </Frame>
-// OFF state (knob left)
+// Estado OFF (botão à esquerda)
 <Frame w={52} h={28} bg="#27272a" rounded={14} flex="row" items="center" p={2} justify="start">
   <Frame w={24} h={24} bg="#52525b" rounded={12} />
 </Frame>
 ```
 
-**3. Buttons need flex + fixed width for centered text:**
+**3. Botões precisam de flex + largura fixa para texto centrado:**
 ```jsx
-// BAD: No flex, text not centered
+// MAU: Sem flex, texto não centrado
 <Frame bg="#3b82f6" px={16} py={10} rounded={10}>
   <Text>Button</Text>
 </Frame>
 
-// GOOD: Flex centers content
+// BOM: Flex centra o conteúdo
 <Frame bg="#3b82f6" px={16} py={10} rounded={10} flex="row" justify="center" items="center">
   <Text>Button</Text>
 </Frame>
 
-// BEST (for components): Fixed width + auto-layout + text fills
+// MELHOR (para componentes): Largura fixa + auto-layout + texto preenche
 <Frame w={100} h={40} bg="#3b82f6" rounded={8} flex="row" justify="center" items="center" px={16} py={10}>
   <Text color="#fff" w="fill" align="center">Button</Text>
 </Frame>
 ```
 
-**Button component pattern (for variants):**
+**Padrão de componente botão (para variantes):**
 ```javascript
-// When creating button components programmatically:
+// Ao criar componentes de botão programaticamente:
 frame.layoutMode = "HORIZONTAL";
-frame.primaryAxisSizingMode = "FIXED";    // Keep fixed width
-frame.counterAxisSizingMode = "FIXED";    // Keep fixed height
-frame.resize(100, 40);                     // Set size AFTER layout mode
+frame.primaryAxisSizingMode = "FIXED";    // Manter largura fixa
+frame.counterAxisSizingMode = "FIXED";    // Manter altura fixa
+frame.resize(100, 40);                     // Definir tamanho APÓS layout mode
 frame.primaryAxisAlignItems = "CENTER";
 frame.counterAxisAlignItems = "CENTER";
 frame.paddingLeft = frame.paddingRight = 16;
 frame.paddingTop = frame.paddingBottom = 10;
 
-// Text inside button
+// Texto dentro do botão
 text.textAlignHorizontal = "CENTER";
-text.layoutAlign = "STRETCH";              // Fill available width
-text.layoutGrow = 1;                       // Grow to fill
+text.layoutAlign = "STRETCH";              // Preencher largura disponível
+text.layoutGrow = 1;                       // Crescer para preencher
 ```
 
-**4. No emojis - use real Lucide icons or shapes:**
+**4. Sem emojis - usar ícones Lucide reais ou formas:**
 ```jsx
-// BAD: Emojis render inconsistently
+// MAU: Emojis renderizam de forma inconsistente
 <Text>🏠</Text>
 
-// BEST: Use real Lucide icons (fetched as SVG from Iconify API)
+// MELHOR: Usar ícones Lucide reais (obtidos como SVG da Iconify API)
 <Icon name="lucide:home" size={20} color="#fff" />
 <Icon name="lucide:settings" size={20} color="var:foreground" />
 
-// OK: Use shapes as fallback icon placeholders
-<Frame w={20} h={20} rounded={4} stroke="#fff" strokeWidth={2} />  // square icon
-<Frame w={20} h={20} rounded={10} stroke="#fff" strokeWidth={2} /> // circle icon
+// OK: Usar formas como placeholders de ícones
+<Frame w={20} h={20} rounded={4} stroke="#fff" strokeWidth={2} />  // ícone quadrado
+<Frame w={20} h={20} rounded={10} stroke="#fff" strokeWidth={2} /> // ícone circular
 ```
 
-**5. Three-dot menu icon:**
+**5. Ícone de menu três pontos:**
 ```jsx
 <Frame flex="row" gap={3} justify="center" items="center">
   <Frame w={4} h={4} bg="#52525b" rounded={2} />
@@ -764,7 +764,7 @@ text.layoutGrow = 1;                       // Grow to fill
 </Frame>
 ```
 
-**6. Star rating with shapes:**
+**6. Classificação por estrelas com formas:**
 ```jsx
 <Frame flex="row" gap={4}>
   <Frame w={14} h={14} bg="#fbbf24" rounded={2} />
@@ -777,42 +777,42 @@ text.layoutGrow = 1;                       // Grow to fill
 
 ---
 
-## Key Rules
+## Regras Importantes
 
-1. **Always use `render` for frames** - has smart positioning
-2. **Never use `eval` to create** - no positioning, overlaps at (0,0)
-3. **Never use `npx figma-use render`** - no smart positioning
-4. **For multiple frames:** Use `render-batch`
-5. **Convert to components:** `node to-component` after creation
-
----
-
-## Onboarding ("Initiate Project")
-
-**Never show terminal commands to users.** Run silently, give friendly feedback.
-
-1. Run `npm install` silently
-2. Ask connection mode (Yolo or Safe)
-3. Run `node src/index.js connect` (or `--safe`)
-4. When connected, say: "Connected! What would you like to create?"
-
-If permission error (macOS): System Settings → Privacy → Full Disk Access → Add Terminal
+1. **Usa sempre `render` para frames** - tem posicionamento inteligente
+2. **Nunca uses `eval` para criar** - sem posicionamento, sobrepõe-se em (0,0)
+3. **Nunca uses `npx figma-use render`** - sem posicionamento inteligente
+4. **Para múltiplos frames:** Usa `render-batch`
+5. **Converter em componentes:** `node to-component` após a criação
 
 ---
 
-## Variable Visualization
+## Onboarding ("Iniciar Projeto")
 
-"Show colors on canvas" / "display variables" / "create palette":
+**Nunca mostres comandos de terminal aos utilizadores.** Executa silenciosamente, dá feedback amigável.
+
+1. Executar `npm install` silenciosamente
+2. Perguntar o modo de conexão (Yolo ou Safe)
+3. Executar `node src/index.js connect` (ou `--safe`)
+4. Quando ligado, dizer: "Ligado! O que gostarias de criar?"
+
+Se erro de permissão (macOS): Definições do Sistema → Privacidade → Acesso Total ao Disco → Adicionar Terminal
+
+---
+
+## Visualização de Variáveis
+
+"Mostra as cores no canvas" / "mostra as variáveis" / "cria paleta":
 ```bash
-node src/index.js var visualize              # All collections
-node src/index.js var visualize "primitives" # Filter
+node src/index.js var visualize              # Todas as coleções
+node src/index.js var visualize "primitives" # Filtrar
 ```
 
-Creates shadcn-style color swatches bound to variables.
+Cria amostras de cor estilo shadcn ligadas às variáveis.
 
 ---
 
-## Website Recreation
+## Recriar Websites
 
 ```bash
 node src/index.js recreate-url "https://example.com" --name "Page"
@@ -823,7 +823,7 @@ node src/index.js screenshot-url "https://example.com"
 
 ## Speed Daemon
 
-`connect` auto-starts daemon for 10x faster commands.
+O `connect` inicia automaticamente o daemon para comandos 10x mais rápidos.
 
 ```bash
 node src/index.js daemon status

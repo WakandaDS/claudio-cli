@@ -1,33 +1,33 @@
-# Figma Plugin API Reference
+# Referência da API de Plugins do Figma
 
-## Node Types
+## Tipos de Nó
 
 ### FrameNode
 - `type: 'FRAME'`
-- Create: `figma.createFrame()`
+- Criar: `figma.createFrame()`
 - Layout: `layoutMode` ('NONE' | 'HORIZONTAL' | 'VERTICAL' | 'GRID')
 - Padding: `paddingLeft`, `paddingRight`, `paddingTop`, `paddingBottom`
-- Sizing: `primaryAxisSizingMode`, `counterAxisSizingMode` ('FIXED' | 'AUTO')
-- Child sizing: `layoutSizingHorizontal`, `layoutSizingVertical` ('FIXED' | 'HUG' | 'FILL')
-- Alignment: `primaryAxisAlignItems` ('MIN' | 'CENTER' | 'MAX' | 'SPACE_BETWEEN')
-- Cross alignment: `counterAxisAlignItems` ('MIN' | 'CENTER' | 'MAX' | 'BASELINE')
-- Spacing: `itemSpacing`, `counterAxisSpacing`
+- Dimensionamento: `primaryAxisSizingMode`, `counterAxisSizingMode` ('FIXED' | 'AUTO')
+- Dimensionamento de children: `layoutSizingHorizontal`, `layoutSizingVertical` ('FIXED' | 'HUG' | 'FILL')
+- Alinhamento: `primaryAxisAlignItems` ('MIN' | 'CENTER' | 'MAX' | 'SPACE_BETWEEN')
+- Alinhamento cruzado: `counterAxisAlignItems` ('MIN' | 'CENTER' | 'MAX' | 'BASELINE')
+- Espaçamento: `itemSpacing`, `counterAxisSpacing`
 - Wrap: `layoutWrap` ('NO_WRAP' | 'WRAP')
-- `clipsContent`: boolean - clips overflow
-- Corner: `cornerRadius`, `cornerSmoothing`, individual corners (`topLeftRadius`, etc.)
-- Styling: `fills`, `strokes`, `effects`, `opacity`, `blendMode`
-- Geometry: `x`, `y`, `width`, `height` (readonly), `resize()`, `resizeWithoutConstraints()`
+- `clipsContent`: boolean - corta overflow
+- Cantos: `cornerRadius`, `cornerSmoothing`, cantos individuais (`topLeftRadius`, etc.)
+- Estilo: `fills`, `strokes`, `effects`, `opacity`, `blendMode`
+- Geometria: `x`, `y`, `width`, `height` (readonly), `resize()`, `resizeWithoutConstraints()`
 - Children: `children` (readonly), `appendChild()`, `insertChild()`, `findAll()`, `findOne()`
-- Variables: `boundVariables`, `setBoundVariable()`
+- Variáveis: `boundVariables`, `setBoundVariable()`
 
 ### TextNode
 - `type: 'TEXT'`
-- Create: `figma.createText()`
-- **CRITICAL**: Must load font before setting `characters`: `await figma.loadFontAsync({family:'Inter',style:'Regular'})`
-- `characters`: raw text content
+- Criar: `figma.createText()`
+- **CRÍTICO**: Tem de carregar a fonte antes de definir `characters`: `await figma.loadFontAsync({family:'Inter',style:'Regular'})`
+- `characters`: conteúdo de texto em bruto
 - `fontSize`: number (min 1)
 - `fontName`: `{family: string, style: string}`
-- `fontWeight`: number (readonly, changes via fontName)
+- `fontWeight`: number (readonly, altera-se via fontName)
 - `textAlignHorizontal`: 'LEFT' | 'CENTER' | 'RIGHT' | 'JUSTIFIED'
 - `textAlignVertical`: 'TOP' | 'CENTER' | 'BOTTOM'
 - `textAutoResize`: 'NONE' | 'WIDTH_AND_HEIGHT' | 'HEIGHT' | 'TRUNCATE'
@@ -36,50 +36,50 @@
 - `letterSpacing`, `lineHeight`, `paragraphSpacing`, `paragraphIndent`
 - `textDecoration`, `textCase`
 - `hasMissingFont`: boolean (readonly)
-- Range methods: `setRangeFontSize()`, `setRangeFontName()`, `setRangeFills()`, etc.
-- `autoRename`: boolean - auto-derive name from characters
+- Métodos de range: `setRangeFontSize()`, `setRangeFontName()`, `setRangeFills()`, etc.
+- `autoRename`: boolean - derivar nome automaticamente dos characters
 - `hyperlink`: HyperlinkTarget | null
 
 ### ComponentNode
 - `type: 'COMPONENT'`
-- Inherits all FrameNode properties
-- `createInstance()`: creates InstanceNode
-- `getInstancesAsync()`: all instances in document
-- `componentPropertyDefinitions`: readonly, all properties with defaults
-- `addComponentProperty(name, type, defaultValue, options?)`: returns name with ID suffix
-- `editComponentProperty(name, newValue)`: modify existing property
-- `deleteComponentProperty(name)`: remove property
-- Property types: 'BOOLEAN' | 'TEXT' | 'INSTANCE_SWAP' | 'VARIANT'
-- `key`: string (readonly) - for `figma.importComponentByKeyAsync()`
-- `remote`: boolean - from team library
+- Herda todas as propriedades de FrameNode
+- `createInstance()`: cria InstanceNode
+- `getInstancesAsync()`: todas as instâncias no documento
+- `componentPropertyDefinitions`: readonly, todas as propriedades com defaults
+- `addComponentProperty(name, type, defaultValue, options?)`: retorna nome com sufixo ID
+- `editComponentProperty(name, newValue)`: modificar propriedade existente
+- `deleteComponentProperty(name)`: remover propriedade
+- Tipos de propriedade: 'BOOLEAN' | 'TEXT' | 'INSTANCE_SWAP' | 'VARIANT'
+- `key`: string (readonly) - para `figma.importComponentByKeyAsync()`
+- `remote`: boolean - de team library
 - `description`, `descriptionMarkdown`
-- Create from frame: `figma.createComponentFromNode(frame)`
+- Criar a partir de frame: `figma.createComponentFromNode(frame)`
 
 ### ComponentSetNode
 - `type: 'COMPONENT_SET'`
-- Container for variant components
-- All children are ComponentNodes
-- `defaultVariant`: top-left-most variant (readonly)
-- `componentPropertyDefinitions`: all variant properties
-- Create: `figma.combineAsVariants(components, parent)`
+- Contentor para componentes variantes
+- Todos os children são ComponentNodes
+- `defaultVariant`: variante no canto superior esquerdo (readonly)
+- `componentPropertyDefinitions`: todas as propriedades de variantes
+- Criar: `figma.combineAsVariants(components, parent)`
 
 ### InstanceNode
 - `type: 'INSTANCE'`
-- `mainComponent`: the source component (setting swaps + clears overrides)
-- `getMainComponentAsync()`: async version
-- `componentProperties`: current values (readonly)
-- `setProperties({...})`: update properties (TEXT/BOOLEAN/INSTANCE_SWAP need #ID suffix)
-- `overrides`: directly overridden fields (readonly)
-- `removeOverrides()`: clear all overrides
-- `swapComponent(comp)`: swap preserving overrides
-- `detachInstance()`: convert to frame
-- `exposedInstances`: nested exposed instances (readonly)
-- `scaleFactor`: instance scale
-- **PERF WARNING**: Avoid alternating writes to ComponentNode then reads from InstanceNode
+- `mainComponent`: o componente de origem (ao definir, faz swap + limpa overrides)
+- `getMainComponentAsync()`: versão assíncrona
+- `componentProperties`: valores actuais (readonly)
+- `setProperties({...})`: actualizar propriedades (TEXT/BOOLEAN/INSTANCE_SWAP precisam de sufixo #ID)
+- `overrides`: campos directamente sobrepostos (readonly)
+- `removeOverrides()`: limpar todos os overrides
+- `swapComponent(comp)`: trocar preservando overrides
+- `detachInstance()`: converter em frame
+- `exposedInstances`: instâncias expostas aninhadas (readonly)
+- `scaleFactor`: escala da instância
+- **AVISO DE PERFORMANCE**: Evitar alternar escritas em ComponentNode com leituras de InstanceNode
 
-## Variables API (`figma.variables`)
+## API de Variáveis (`figma.variables`)
 
-### Methods
+### Métodos
 ```
 getVariableByIdAsync(id: string): Promise<Variable | null>
 getVariableCollectionByIdAsync(id: string): Promise<VariableCollection | null>
@@ -93,33 +93,33 @@ setBoundVariableForEffect(effect, field, variable | null): Effect
 importVariableByKeyAsync(key): Promise<Variable>
 ```
 
-### Variable Object
+### Objecto Variable
 - `id`, `name`, `description`: string
 - `remote`: boolean (readonly)
 - `resolvedType`: VariableResolvedDataType ('BOOLEAN' | 'FLOAT' | 'STRING' | 'COLOR')
-- `valuesByMode`: {[modeId]: value} (readonly, doesn't resolve aliases)
-- `setValueForMode(modeId, newValue)`: set value for mode
+- `valuesByMode`: {[modeId]: value} (readonly, não resolve aliases)
+- `setValueForMode(modeId, newValue)`: definir valor para modo
 - `variableCollectionId`: string (readonly)
-- `key`: string (readonly) - for import
-- `scopes`: VariableScope[] - UI visibility
+- `key`: string (readonly) - para importação
+- `scopes`: VariableScope[] - visibilidade na UI
 - `codeSyntax`: {WEB?, ANDROID?, iOS?} (readonly)
 - `hiddenFromPublishing`: boolean
-- `resolveForConsumer(node)`: get resolved value
-- `remove()`: delete variable
+- `resolveForConsumer(node)`: obter valor resolvido
+- `remove()`: apagar variável
 
-### VariableCollection Object
+### Objecto VariableCollection
 - `id`, `name`: string
 - `modes`: [{modeId, name}] (readonly)
 - `defaultModeId`: string (readonly)
 - `variableIds`: string[] (readonly)
 - `remote`, `hiddenFromPublishing`: boolean
-- `addMode(name)`: returns modeId (limited by pricing tier)
+- `addMode(name)`: retorna modeId (limitado pelo plano de preço)
 - `removeMode(modeId)`, `renameMode(modeId, name)`
-- `remove()`: delete collection + all variables
+- `remove()`: apagar coleção + todas as variáveis
 
-### Binding Variables to Fills
+### Vincular Variáveis a Fills
 ```javascript
-// Create bound paint
+// Criar paint vinculado
 const paint = figma.variables.setBoundVariableForPaint(
   { type: 'SOLID', color: { r: 0.5, g: 0.5, b: 0.5 } },
   'color',
@@ -128,16 +128,16 @@ const paint = figma.variables.setBoundVariableForPaint(
 node.fills = [paint];
 ```
 
-### Binding Variables to Node Properties
+### Vincular Variáveis a Propriedades de Nó
 ```javascript
-node.setBoundVariable('fills', 0, variable);  // bind fill at index
+node.setBoundVariable('fills', 0, variable);  // vincular fill no índice
 node.setBoundVariable('itemSpacing', variable);
 node.setBoundVariable('paddingLeft', variable);
-// etc. for: visible, opacity, cornerRadius, strokeWeight, ...
+// etc. para: visible, opacity, cornerRadius, strokeWeight, ...
 ```
 
 ## boundVariables (REST API)
-Properties that can have variables bound:
+Propriedades que podem ter variáveis vinculadas:
 - `size.x`, `size.y`
 - `itemSpacing`, `counterAxisSpacing`
 - `paddingLeft/Right/Top/Bottom`
@@ -150,92 +150,92 @@ Properties that can have variables bound:
 - `letterSpacing[]`, `lineHeight[]`
 - `paragraphSpacing[]`, `paragraphIndent[]`
 
-## Auto-Layout Rules
+## Regras de Auto-Layout
 
-### Axis Mapping
-| Layout Mode | Primary Axis | Counter Axis |
-|-------------|-------------|--------------|
-| VERTICAL    | Height (Y)  | Width (X)    |
-| HORIZONTAL  | Width (X)   | Height (Y)   |
+### Mapeamento de Eixos
+| Modo de Layout | Eixo Primário | Eixo Secundário |
+|----------------|---------------|-----------------|
+| VERTICAL       | Height (Y)    | Width (X)       |
+| HORIZONTAL     | Width (X)     | Height (Y)      |
 
-### Sizing Modes
-- `primaryAxisSizingMode`: 'FIXED' (explicit size) | 'AUTO' (hug content)
+### Modos de Dimensionamento
+- `primaryAxisSizingMode`: 'FIXED' (tamanho explícito) | 'AUTO' (ajustar ao conteúdo)
 - `counterAxisSizingMode`: 'FIXED' | 'AUTO'
-- These are for the frame ITSELF
+- Estes são para a própria frame
 
-### Child Sizing (set AFTER appendChild!)
+### Dimensionamento de Children (definir DEPOIS de appendChild!)
 - `layoutSizingHorizontal`: 'FIXED' | 'HUG' | 'FILL'
 - `layoutSizingVertical`: 'FIXED' | 'HUG' | 'FILL'
-- FILL = stretch to fill parent (only in auto-layout parent)
-- HUG = shrink to fit content
-- FIXED = explicit width/height via resize()
+- FILL = esticar para preencher o pai (apenas em pai com auto-layout)
+- HUG = encolher para caber no conteúdo
+- FIXED = width/height explícitos via resize()
 
-### Common Patterns
+### Padrões Comuns
 ```javascript
-// Frame that hugs content vertically, fixed width
+// Frame que ajusta ao conteúdo verticalmente, largura fixa
 frame.layoutMode = 'VERTICAL';
-frame.primaryAxisSizingMode = 'AUTO';  // height hugs
-frame.counterAxisSizingMode = 'FIXED'; // width fixed
+frame.primaryAxisSizingMode = 'AUTO';  // height ajusta
+frame.counterAxisSizingMode = 'FIXED'; // width fixo
 frame.resize(300, 1);
 
-// Child that fills parent width
+// Child que preenche a largura do pai
 parent.appendChild(child);
-child.layoutSizingHorizontal = 'FILL'; // MUST be after appendChild
+child.layoutSizingHorizontal = 'FILL'; // TEM de ser depois de appendChild
 
-// Grow pattern (spacer)
-spacer.layoutSizingHorizontal = 'FILL'; // in horizontal parent
-spacer.layoutSizingVertical = 'FILL';   // in vertical parent
+// Padrão grow (espaçador)
+spacer.layoutSizingHorizontal = 'FILL'; // em pai horizontal
+spacer.layoutSizingVertical = 'FILL';   // em pai vertical
 ```
 
-## Global figma Methods
+## Métodos Globais figma
 - `figma.createFrame()`, `figma.createText()`, `figma.createRectangle()`
-- `figma.createComponentFromNode(node)`: convert frame to component
-- `figma.combineAsVariants(components[], parent)`: create variant set
-- `figma.loadFontAsync({family, style})`: required before text ops
-- `figma.getNodeByIdAsync(id)`: find node
-- `figma.currentPage`: active page
-- `figma.root`: document root
-- `figma.variables`: VariablesAPI namespace
+- `figma.createComponentFromNode(node)`: converter frame em componente
+- `figma.combineAsVariants(components[], parent)`: criar conjunto de variantes
+- `figma.loadFontAsync({family, style})`: obrigatório antes de operações com texto
+- `figma.getNodeByIdAsync(id)`: encontrar nó
+- `figma.currentPage`: página activa
+- `figma.root`: raiz do documento
+- `figma.variables`: namespace VariablesAPI
 
-## Important Gotchas
+## Avisos Importantes
 
-### layoutWrap only on HORIZONTAL
-- `layoutWrap = 'WRAP'` throws error on VERTICAL frames
-- `counterAxisSpacing` and `counterAxisAlignContent` only work with WRAP
+### layoutWrap apenas em HORIZONTAL
+- `layoutWrap = 'WRAP'` dá erro em frames VERTICAL
+- `counterAxisSpacing` e `counterAxisAlignContent` só funcionam com WRAP
 
-### STRETCH + AUTO conflict
-- Child with `layoutAlign = 'STRETCH'` that is itself auto-layout: MUST set corresponding sizing to FIXED
-- A frame cannot simultaneously stretch-to-fill AND hug-children
-- Same applies to `layoutGrow = 1` on auto-layout child frames
+### Conflito STRETCH + AUTO
+- Child com `layoutAlign = 'STRETCH'` que é auto-layout: TEM de definir o sizing correspondente como FIXED
+- Uma frame não pode simultaneamente esticar-para-preencher E ajustar-aos-children
+- O mesmo aplica-se a `layoutGrow = 1` em child frames com auto-layout
 
-### SPACE_BETWEEN works
-- `primaryAxisAlignItems = 'SPACE_BETWEEN'` does work in the API
-- The CLAUDE.md note about it being unreliable may be a JSX mapping issue
+### SPACE_BETWEEN funciona
+- `primaryAxisAlignItems = 'SPACE_BETWEEN'` funciona na API
+- A nota no CLAUDE.md sobre ser instável pode ser um problema de mapeamento JSX
 
-### Fills/Strokes are Immutable Arrays
-- Must clone, modify, reassign: `const fills = [...node.fills]; fills[0] = ...; node.fills = fills;`
-- Pattern fills require `setFillsAsync()`, not direct assignment
+### Fills/Strokes são Arrays Imutáveis
+- Tem de clonar, modificar, reatribuir: `const fills = [...node.fills]; fills[0] = ...; node.fills = fills;`
+- Pattern fills requerem `setFillsAsync()`, não atribuição directa
 
-### createComponentFromNode Constraints
-- Node cannot already be a Component or ComponentSet
-- Node cannot be inside a Component, ComponentSet, or Instance
-- Violating these throws error
+### Restrições de createComponentFromNode
+- O nó não pode já ser um Component ou ComponentSet
+- O nó não pode estar dentro de um Component, ComponentSet ou Instance
+- Violar estas regras dá erro
 
 ### counterAxisSpacing
-- Set to `null` to sync with `itemSpacing`
-- Once set to a number, never returns null again
+- Definir como `null` para sincronizar com `itemSpacing`
+- Uma vez definido como número, nunca retorna null novamente
 
-### width/height are Readonly
-- Use `resize()`, `resizeWithoutConstraints()`, or layoutSizing properties
-- `resize()` respects child constraints, `resizeWithoutConstraints()` ignores them
+### width/height são Readonly
+- Usar `resize()`, `resizeWithoutConstraints()`, ou propriedades layoutSizing
+- `resize()` respeita constraints dos children, `resizeWithoutConstraints()` ignora-as
 
-### Setting layoutMode to NONE is Destructive
-- Reverting from auto-layout to NONE does NOT restore original child positions
+### Definir layoutMode como NONE é Destrutivo
+- Reverter de auto-layout para NONE NÃO restaura as posições originais dos children
 
-## Deprecated API (avoid)
-- `getVariableById()` -> use `getVariableByIdAsync()`
-- `getLocalVariables()` -> use `getLocalVariablesAsync()`
-- `getLocalVariableCollections()` -> use `getLocalVariableCollectionsAsync()`
-- `layoutGrow` -> use `layoutSizingHorizontal/Vertical = 'FILL'`
-- `layoutAlign` -> use `layoutSizingHorizontal/Vertical`
-- `primaryAxisSizingMode`/`counterAxisSizingMode` for children -> use `layoutSizingHorizontal/Vertical`
+## API Depreciada (evitar)
+- `getVariableById()` -> usar `getVariableByIdAsync()`
+- `getLocalVariables()` -> usar `getLocalVariablesAsync()`
+- `getLocalVariableCollections()` -> usar `getLocalVariableCollectionsAsync()`
+- `layoutGrow` -> usar `layoutSizingHorizontal/Vertical = 'FILL'`
+- `layoutAlign` -> usar `layoutSizingHorizontal/Vertical`
+- `primaryAxisSizingMode`/`counterAxisSizingMode` para children -> usar `layoutSizingHorizontal/Vertical`
