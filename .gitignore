@@ -15,3 +15,6 @@ screenshot.png
 # Ficheiros temporários
 *.base
 nul
+
+# Auditorias locais
+audit/
